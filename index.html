@@ -60,6 +60,9 @@
   button.ghost { background: transparent; color: var(--accent); padding: 8px 4px; font-weight: 500; }
   details { margin-top: 10px; color: var(--muted); font-size: 14px; }
   details input { width: 100%; margin-top: 8px; }
+  .guide { display: block; margin-top: 10px; padding: 12px; border-radius: 10px; text-align: center;
+           background: var(--card); border: 1px solid var(--line); color: var(--accent);
+           font-weight: 600; text-decoration: none; }
   summary { cursor: pointer; }
   .help { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
           padding: 10px 14px; color: var(--text); font-size: 14px; }
@@ -116,6 +119,7 @@
            placeholder="Dán link thư mục Google Drive…" required>
     <button id="go">Xem</button>
   </form>
+  <a class="guide" href="huong-dan.html">📖 Hướng dẫn có hình ảnh từng bước</a>
   <details id="keyBox">
     <summary>Google API key</summary>
     <input id="key" type="text" autocomplete="off" placeholder="AIza…">
@@ -314,7 +318,14 @@ $('#dl').addEventListener('click', async () => {
     prepared = await fetchAll(list, getKey(), n => btn.textContent = `Đang tải ${n}/${list.length}…`);
     // Trình duyệt chỉ cho mở menu chia sẻ ngay sau một lần chạm, nên hỏi lại người dùng
     const canShare = navigator.canShare?.({ files: prepared });
+    // iPhone lưu vào Ảnh qua menu chia sẻ; Android/máy tính thì tải file thẳng vào máy
+    const preferShare = canShare && !/Android/i.test(navigator.userAgent);
     $('#share').hidden = !canShare;
+    $('#share').textContent = preferShare ? 'Lưu vào điện thoại' : 'Chia sẻ…';
+    $('#share').className = preferShare ? '' : 'ghost';
+    $('#saveFiles').textContent = preferShare ? 'Tải dạng file' : 'Lưu vào điện thoại';
+    $('#saveFiles').className = preferShare ? 'ghost' : '';
+    $('#saveFiles').style.order = preferShare ? '' : '-1';
     $('#readyText').textContent = `Đã sẵn sàng ${prepared.length} ảnh.`;
     $('#ready').showModal();
   } catch (err) {
