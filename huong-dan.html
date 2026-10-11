@@ -31,8 +31,8 @@
   .dot { display: inline-block; width: 16px; height: 16px; border: 3px solid var(--red); border-radius: 50%;
          vertical-align: -2px; }
 
-  .jump { display: flex; gap: 10px; margin: 16px 0 4px; }
-  .jump a { flex: 1; text-align: center; padding: 14px 10px; border-radius: 14px; font-weight: 700;
+  .jump { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 4px; }
+  .jump a { flex: 1 1 140px; text-align: center; padding: 14px 10px; border-radius: 14px; font-weight: 700;
             background: var(--card); color: var(--accent); text-decoration: none; border: 1px solid var(--line); }
 
   h2 { font-size: 24px; margin: 32px 0 2px; scroll-margin-top: 12px; }
@@ -47,6 +47,17 @@
   .step h3 b { color: var(--accent); }
   .note { margin: 10px 0 0; color: var(--muted); font-size: 16px; }
   .phone { display: block; width: 100%; max-width: 250px; margin: 16px auto 0; height: auto; }
+  .win { display: block; width: 100%; max-width: 420px; margin: 16px auto 0; height: auto; }
+  .num.k { background: #8e44ef; }
+  .go { display: block; margin: 14px 0 0; padding: 13px; border-radius: 12px; text-align: center;
+        background: var(--accent); color: #fff; font-weight: 700; text-decoration: none; }
+  .note code { background: var(--bg); padding: 2px 6px; border-radius: 6px; font-size: 14px; word-break: break-all;
+               color: var(--text); user-select: all; }
+  .note ul { margin: 6px 0 0; padding-left: 20px; }
+  .t.u { font-size: 8.5px; fill: #3c4043; }
+  .t.m { font-family: ui-monospace, Menlo, Consolas, monospace; }
+  .gbtn { fill: #1a73e8; }
+  .badge { fill: #ff3b30; }
   .done { text-align: center; font-size: 22px; font-weight: 700; padding: 26px 18px; }
 
   /* Hình minh hoạ: màn hình điện thoại luôn sáng như thật, bất kể giao diện tối */
@@ -111,6 +122,30 @@
       <use href="#unchk" x="99" y="135" width="20" height="20"/><use href="#unchk" x="172" y="135" width="20" height="20"/>
       <use href="#unchk" x="26" y="208" width="20" height="20"/><use href="#unchk" x="99" y="208" width="20" height="20"/>
       <use href="#unchk" x="172" y="208" width="20" height="20"/>
+      <g fill="rgba(0,0,0,.5)" stroke="#fff" stroke-width="1.5">
+        <circle cx="78" cy="114" r="10"/><circle cx="151" cy="114" r="10"/><circle cx="224" cy="114" r="10"/>
+        <circle cx="78" cy="187" r="10"/><circle cx="151" cy="187" r="10"/><circle cx="224" cy="187" r="10"/>
+        <circle cx="78" cy="260" r="10"/><circle cx="151" cy="260" r="10"/><circle cx="224" cy="260" r="10"/>
+      </g>
+      <g font-size="9" text-anchor="middle">
+        <text x="78" y="117">🔍</text><text x="151" y="117">🔍</text><text x="224" y="117">🔍</text>
+        <text x="78" y="190">🔍</text><text x="151" y="190">🔍</text><text x="224" y="190">🔍</text>
+        <text x="78" y="263">🔍</text><text x="151" y="263">🔍</text><text x="224" y="263">🔍</text>
+      </g>
+    </symbol>
+    <!-- Khung trình duyệt máy tính + thanh đầu trang Google Cloud -->
+    <symbol id="win" viewBox="0 0 320 220">
+      <rect x="1" y="1" width="318" height="218" rx="10" fill="#fff" stroke="#c9c9c9"/>
+      <path d="M1 11a10 10 0 0 1 10-10h298a10 10 0 0 1 10 10v16H1z" fill="#e8eaed"/>
+      <circle cx="13" cy="14" r="3.5" fill="#ff5f57"/><circle cx="25" cy="14" r="3.5" fill="#febc2e"/><circle cx="37" cy="14" r="3.5" fill="#28c840"/>
+      <rect x="50" y="6" width="262" height="15" rx="7.5" fill="#fff"/>
+    </symbol>
+    <symbol id="gcHead" viewBox="0 0 320 220">
+      <text class="t" x="10" y="45" style="font-size:13px">☰</text>
+      <text class="t b" x="28" y="45" style="font-size:12px">Google Cloud</text>
+      <rect x="118" y="33" width="124" height="16" rx="4" fill="#fff" stroke="#dadce0"/>
+      <text class="t s" x="124" y="45" style="font-size:9px">my-api-key-youtube ▾</text>
+      <line class="ln" x1="1" y1="53" x2="319" y2="53"/>
     </symbol>
     <!-- Danh sách thư mục trong app Drive -->
     <symbol id="driveList" viewBox="0 0 260 460">
@@ -170,6 +205,7 @@
   <nav class="jump">
     <a href="#p1">① Chia sẻ thư mục</a>
     <a href="#p2">② Tải ảnh về máy</a>
+    <a href="#p3">③ Tạo API key</a>
   </nav>
 
   <h2 id="p1">Phần 1 · Chia sẻ thư mục ảnh</h2>
@@ -282,7 +318,43 @@
     </article>
 
     <article class="step">
-      <header><span class="num">8</span><h3>Bấm nút xanh <b>Tải về</b> ở dưới cùng</h3></header>
+      <header><span class="num">8</span><h3>Muốn xem ảnh to: bấm <b>🔍</b> ở góc ảnh</h3></header>
+      <svg class="phone" viewBox="0 0 260 460" role="img" aria-label="Lưới ảnh, khoanh đỏ nút kính lúp ở góc một ảnh">
+        <rect class="frame" width="260" height="460" rx="32"/>
+        <use href="#grid" width="260" height="460"/>
+        <text class="t s" x="22" y="44">9 ảnh · đã chọn 1</text>
+        <use href="#chk" x="26" y="62" width="20" height="20"/>
+        <circle class="hlc pulse" cx="151" cy="187" r="15"/>
+        <text class="finger" x="136" y="232">👆</text>
+      </svg>
+      <p class="note">Bước này không bắt buộc, dùng khi muốn xem rõ ảnh trước khi chọn.</p>
+    </article>
+
+    <article class="step">
+      <header><span class="num">9</span><h3>Xem ảnh to, <b>vuốt ngang</b> để xem ảnh khác</h3></header>
+      <svg class="phone" viewBox="0 0 260 460" role="img" aria-label="Màn hình xem ảnh to, nền đen, nút chọn ảnh ở dưới">
+        <rect class="frame" width="260" height="460" rx="32"/>
+        <rect x="10" y="10" width="240" height="440" rx="24" fill="#000"/>
+        <text class="t w" x="24" y="44" style="font-size:12px">5 / 9 · anh-5.jpg</text>
+        <circle cx="226" cy="40" r="15" fill="#333"/><text class="t w c" x="226" y="45" style="font-size:14px">✕</text>
+        <rect x="10" y="80" width="240" height="240" fill="url(#p3)"/><use href="#mtn" x="10" y="80" width="240" height="240"/>
+        <rect x="16" y="180" width="24" height="40" rx="6" fill="rgba(255,255,255,.3)"/><text class="t w c" x="28" y="208" style="font-size:24px">‹</text>
+        <rect x="220" y="180" width="24" height="40" rx="6" fill="rgba(255,255,255,.3)"/><text class="t w c" x="232" y="208" style="font-size:24px">›</text>
+        <text class="t w b c" x="130" y="268" style="font-size:15px; paint-order: stroke; stroke: rgba(0,0,0,.45); stroke-width: 4px">⟵  vuốt  ⟶</text>
+        <text class="t w c" x="130" y="350" style="font-size:10px; opacity:.7">Vuốt ngang để xem ảnh khác</text>
+        <rect x="26" y="370" width="208" height="42" rx="10" fill="#0a84ff"/>
+        <text class="t w b c" x="130" y="396" style="font-size:14px">✓ Đã chọn ảnh này</text>
+        <rect class="hlc pulse" x="21" y="365" width="218" height="52" rx="13"/>
+      </svg>
+      <ul class="note">
+        <li><b>Vuốt sang trái / phải</b> (hoặc bấm <b>‹ ›</b>) để xem ảnh khác.</li>
+        <li><b>Chạm 2 lần</b> hoặc <b>dùng 2 ngón</b> để phóng to, chạm 2 lần nữa để thu nhỏ.</li>
+        <li>Bấm <b>Chọn ảnh này</b> để chọn luôn. Bấm <b>✕</b> để đóng.</li>
+      </ul>
+    </article>
+
+    <article class="step">
+      <header><span class="num">10</span><h3>Bấm nút xanh <b>Tải về</b> ở dưới cùng</h3></header>
       <svg class="phone" viewBox="0 0 260 460" role="img" aria-label="Khoanh đỏ nút Tải về ở cuối màn hình">
         <rect class="frame" width="260" height="460" rx="32"/>
         <use href="#grid" width="260" height="460"/>
@@ -298,7 +370,7 @@
     </article>
 
     <article class="step">
-      <header><span class="num">9</span><h3>Bấm <b>Lưu vào điện thoại</b></h3></header>
+      <header><span class="num">11</span><h3>Bấm <b>Lưu vào điện thoại</b></h3></header>
       <svg class="phone" viewBox="0 0 260 460" role="img" aria-label="Hộp thoại, khoanh đỏ nút Lưu vào điện thoại">
         <rect class="frame" width="260" height="460" rx="32"/>
         <use href="#grid" width="260" height="460"/>
@@ -315,7 +387,7 @@
     </article>
 
     <article class="step">
-      <header><span class="num">10</span><h3><b>iPhone:</b> bấm <b>Lưu 2 hình ảnh</b></h3></header>
+      <header><span class="num">12</span><h3><b>iPhone:</b> bấm <b>Lưu 2 hình ảnh</b></h3></header>
       <svg class="phone" viewBox="0 0 260 460" role="img" aria-label="Bảng chia sẻ của iPhone, khoanh đỏ Lưu hình ảnh">
         <rect class="frame" width="260" height="460" rx="32"/>
         <use href="#grid" width="260" height="460"/>
@@ -341,7 +413,7 @@
     </article>
 
     <article class="step">
-      <header><span class="num">10</span><h3><b>Android:</b> ảnh tự lưu, mở app <b>Thư viện</b> để xem</h3></header>
+      <header><span class="num">12</span><h3><b>Android:</b> ảnh tự lưu, mở app <b>Thư viện</b> để xem</h3></header>
       <svg class="phone" viewBox="0 0 260 460" role="img" aria-label="Thông báo đã tải xong và các app xem ảnh trên Android">
         <rect class="frame" width="260" height="460" rx="32"/>
         <rect x="10" y="10" width="240" height="440" rx="24" fill="#2d3b55"/>
@@ -363,6 +435,180 @@
 
     <article class="step done">🎉 Xong! Ảnh đã nằm trong điện thoại.<br>
       <a class="back" style="margin-top:14px; color: var(--accent); background: transparent; border: 1px solid var(--line)" href="./">← Quay lại trang tải ảnh</a>
+    </article>
+  </div>
+
+  <h2 id="p3">Phần 3 · Tạo API key</h2>
+  <p class="sub">Chỉ người cài đặt web làm <b>1 lần</b>, nên làm trên <b>máy tính</b>. Người dùng bình thường bỏ qua phần này.</p>
+  <div class="steps">
+
+    <article class="step">
+      <header><span class="num k">1</span><h3>Mở trang bật Drive API, kiểm tra <b>Project</b> rồi bấm <b>NEXT</b></h3></header>
+      <a class="go" href="https://console.cloud.google.com/flows/enableapi?apiid=drive.googleapis.com&amp;hl=en" target="_blank" rel="noopener">Mở trang bật Drive API ↗</a>
+      <svg class="win" viewBox="0 0 320 220" role="img" aria-label="Trang Enable access to API, khoanh đỏ ô Project và nút NEXT">
+        <use href="#win" width="320" height="220"/><use href="#gcHead" width="320" height="220"/>
+        <text class="t u" x="58" y="17">console.cloud.google.com/flows/enableapi?apiid=drive…</text>
+        <text class="t b" x="16" y="76">Enable access to API</text>
+        <circle class="gbtn" cx="22" cy="96" r="7"/><text class="t w b c" x="22" y="99.5" style="font-size:9px">1</text>
+        <text class="t" x="34" y="99.5" style="font-size:10px">Confirm project</text>
+        <line class="ln" x1="118" y1="96" x2="136" y2="96"/>
+        <circle cx="146" cy="96" r="7" fill="#bdc1c6"/><text class="t w b c" x="146" y="99.5" style="font-size:9px">2</text>
+        <text class="t s" x="158" y="99.5" style="font-size:10px">Enable APIs</text>
+        <text class="t s" x="16" y="124" style="font-size:10px">Project</text>
+        <rect x="16" y="130" width="190" height="26" rx="4" fill="#fff" stroke="#80868b"/>
+        <text class="t" x="24" y="147" style="font-size:11px">my-api-key-youtube</text><text class="t s" x="198" y="147" text-anchor="end">▾</text>
+        <rect class="gbtn" x="16" y="172" width="60" height="26" rx="4"/><text class="t w b c" x="46" y="189" style="font-size:11px">NEXT</text>
+        <rect class="hlc" x="12" y="126" width="198" height="34" rx="6"/>
+        <circle class="badge" cx="210" cy="127" r="8"/><text class="t w b c" x="210" y="130.5" style="font-size:10px">1</text>
+        <rect class="hlc pulse" x="11" y="167" width="70" height="36" rx="7"/>
+        <circle class="badge" cx="81" cy="168" r="8"/><text class="t w b c" x="81" y="171.5" style="font-size:10px">2</text>
+        <text class="finger" x="88" y="196" style="font-size:20px">👈</text>
+      </svg>
+      <p class="note">① Ô <b>Project</b> phải là project của bạn (ví dụ <i>my-api-key-youtube</i>). Nếu chưa đăng nhập, Google sẽ hỏi đăng nhập trước.</p>
+    </article>
+
+    <article class="step">
+      <header><span class="num k">2</span><h3>Bấm <b>ENABLE</b></h3></header>
+      <svg class="win" viewBox="0 0 320 220" role="img" aria-label="Bước Enable APIs, khoanh đỏ nút ENABLE">
+        <use href="#win" width="320" height="220"/><use href="#gcHead" width="320" height="220"/>
+        <text class="t u" x="58" y="17">console.cloud.google.com/flows/enableapi?apiid=drive…</text>
+        <text class="t b" x="16" y="76">Enable access to API</text>
+        <circle cx="22" cy="96" r="7" fill="#1e8e3e"/><text class="t w b c" x="22" y="99.5" style="font-size:9px">✓</text>
+        <text class="t s" x="34" y="99.5" style="font-size:10px">Confirm project</text>
+        <line class="ln" x1="118" y1="96" x2="136" y2="96"/>
+        <circle class="gbtn" cx="146" cy="96" r="7"/><text class="t w b c" x="146" y="99.5" style="font-size:9px">2</text>
+        <text class="t" x="158" y="99.5" style="font-size:10px">Enable APIs</text>
+        <text class="t s" x="16" y="126" style="font-size:10px">APIs to be enabled:</text>
+        <text class="t b" x="16" y="146" style="font-size:11px">•  Google Drive API</text>
+        <rect class="gbtn" x="16" y="166" width="70" height="26" rx="4"/><text class="t w b c" x="51" y="183" style="font-size:11px">ENABLE</text>
+        <rect class="hlc pulse" x="11" y="161" width="80" height="36" rx="7"/>
+        <text class="finger" x="96" y="190" style="font-size:20px">👈</text>
+      </svg>
+      <p class="note">Chờ vài giây. Thấy chữ <b>API enabled</b> hoặc nút <b>MANAGE</b> là xong.</p>
+    </article>
+
+    <article class="step">
+      <header><span class="num k">3</span><h3>Mở trang Credentials, bấm <b>+ CREATE CREDENTIALS</b> → <b>API key</b></h3></header>
+      <a class="go" href="https://console.cloud.google.com/apis/credentials?hl=en" target="_blank" rel="noopener">Mở trang Credentials ↗</a>
+      <svg class="win" viewBox="0 0 320 220" role="img" aria-label="Trang Credentials, khoanh đỏ nút Create credentials và mục API key">
+        <use href="#win" width="320" height="220"/><use href="#gcHead" width="320" height="220"/>
+        <text class="t u" x="58" y="17">console.cloud.google.com/apis/credentials</text>
+        <rect x="2" y="54" width="85" height="164" fill="#f8f9fa"/>
+        <text class="t b" x="8" y="72" style="font-size:9.5px">APIs &amp; Services</text>
+        <text class="t s" x="8" y="92" style="font-size:9.5px">Enabled APIs</text>
+        <text class="t s" x="8" y="110" style="font-size:9.5px">Library</text>
+        <rect x="2" y="118" width="85" height="18" fill="#e8f0fe"/>
+        <text class="t b" x="8" y="131" style="font-size:9.5px; fill:#1a73e8">Credentials</text>
+        <text class="t b" x="98" y="74">Credentials</text>
+        <text class="t b" x="98" y="97" style="font-size:10px; fill:#1a73e8">+ CREATE CREDENTIALS</text>
+        <rect x="98" y="106" width="190" height="92" rx="4" fill="#fff" stroke="#dadce0"/>
+        <text class="t b" x="110" y="129" style="font-size:11px">API key</text>
+        <line class="ln" x1="98" y1="140" x2="288" y2="140"/>
+        <text class="t" x="110" y="158" style="font-size:11px">OAuth client ID</text>
+        <line class="ln" x1="98" y1="168" x2="288" y2="168"/>
+        <text class="t" x="110" y="186" style="font-size:11px">Service account</text>
+        <rect class="hlc" x="93" y="85" width="128" height="18" rx="5"/>
+        <circle class="badge" cx="222" cy="86" r="8"/><text class="t w b c" x="222" y="89.5" style="font-size:10px">1</text>
+        <rect class="hlc pulse" x="102" y="114" width="182" height="22" rx="5"/>
+        <circle class="badge" cx="284" cy="115" r="8"/><text class="t w b c" x="284" y="118.5" style="font-size:10px">2</text>
+        <text class="finger" x="160" y="134" style="font-size:18px">👈</text>
+      </svg>
+    </article>
+
+    <article class="step">
+      <header><span class="num k">4</span><h3>Bấm <b>📋</b> để copy key</h3></header>
+      <svg class="win" viewBox="0 0 320 220" role="img" aria-label="Hộp thoại API key created, khoanh đỏ nút copy">
+        <use href="#win" width="320" height="220"/><use href="#gcHead" width="320" height="220"/>
+        <text class="t u" x="58" y="17">console.cloud.google.com/apis/credentials</text>
+        <text class="t b" x="16" y="74">Credentials</text>
+        <path d="M1 27h318v181a10 10 0 0 1-10 10H11a10 10 0 0 1-10-10z" class="dim"/>
+        <rect x="40" y="62" width="240" height="132" rx="8" fill="#fff"/>
+        <text class="t b" x="56" y="86">API key created</text>
+        <text class="t s" x="56" y="104" style="font-size:10px">Use this key in your application</text>
+        <rect x="56" y="112" width="208" height="26" rx="4" fill="#f1f3f4"/>
+        <text class="t m" x="64" y="129" style="font-size:10.5px">AIzaSyB3x•••••••••••••</text>
+        <text class="t c" x="248" y="130" style="font-size:12px">📋</text>
+        <text class="t b" x="264" y="180" text-anchor="end" style="font-size:11px; fill:#1a73e8">CLOSE</text>
+        <circle class="hlc pulse" cx="248" cy="125" r="12"/>
+        <text class="finger" x="282" y="134" style="font-size:18px">👈</text>
+      </svg>
+      <p class="note">Key có dạng <b>AIza…</b>. Dán tạm vào Ghi chú hoặc Zalo cho khỏi mất, rồi bấm <b>CLOSE</b>. Sau đó bấm vào <b>tên key</b> (ví dụ <i>API key 1</i>) trong danh sách để sang bước 5.</p>
+      <p class="note">💡 Nếu Google hiện bảng <b>Create API key</b> có sẵn các mục giới hạn, làm luôn bước 5–6 trong bảng đó rồi bấm <b>Create</b>.</p>
+    </article>
+
+    <article class="step">
+      <header><span class="num k">5</span><h3>Khoá key theo web: chọn <b>Websites</b> → <b>+ ADD</b> → dán địa chỉ web</h3></header>
+      <svg class="win" viewBox="0 0 320 220" role="img" aria-label="Trang Edit API key, khoanh đỏ Websites, nút Add và ô địa chỉ web">
+        <use href="#win" width="320" height="220"/><use href="#gcHead" width="320" height="220"/>
+        <text class="t u" x="58" y="17">console.cloud.google.com/apis/credentials/key/…</text>
+        <text class="t b" x="16" y="74">Edit API key</text>
+        <text class="t b" x="16" y="88" style="font-size:10px">Application restrictions</text>
+        <circle cx="22" cy="112" r="4.5" fill="none" stroke="#5f6368"/><text class="t" x="32" y="115.5" style="font-size:10px">None</text>
+        <circle cx="22" cy="128" r="4.5" fill="none" stroke="#1a73e8" stroke-width="1.5"/><circle class="gbtn" cx="22" cy="128" r="2.5"/>
+        <text class="t b" x="32" y="131.5" style="font-size:10px">Websites</text>
+        <circle cx="22" cy="144" r="4.5" fill="none" stroke="#5f6368"/><text class="t" x="32" y="147.5" style="font-size:10px">IP addresses</text>
+        <circle cx="22" cy="160" r="4.5" fill="none" stroke="#5f6368"/><text class="t" x="32" y="163.5" style="font-size:10px">Android apps</text>
+        <text class="t b" x="128" y="102" style="font-size:10px">Website restrictions</text>
+        <rect x="128" y="108" width="184" height="88" rx="4" fill="#fff" stroke="#dadce0"/>
+        <text class="t b" x="138" y="126" style="font-size:10px; fill:#1a73e8">+ ADD</text>
+        <rect x="136" y="136" width="168" height="22" rx="3" fill="#fff" stroke="#1a73e8" stroke-width="1.5"/>
+        <text class="t" x="140" y="151" style="font-size:8px">https://leducminh2310.github.io/*</text>
+        <text class="t b" x="300" y="182" text-anchor="end" style="font-size:10px; fill:#1a73e8">DONE</text>
+        <rect class="hlc" x="13" y="119" width="88" height="18" rx="5"/>
+        <circle class="badge" cx="102" cy="120" r="8"/><text class="t w b c" x="102" y="123.5" style="font-size:10px">1</text>
+        <rect class="hlc" x="133" y="114" width="44" height="18" rx="5"/>
+        <circle class="badge" cx="178" cy="115" r="8"/><text class="t w b c" x="178" y="118.5" style="font-size:10px">2</text>
+        <rect class="hlc pulse" x="132" y="132" width="176" height="30" rx="5"/>
+        <circle class="badge" cx="306" cy="133" r="8"/><text class="t w b c" x="306" y="136.5" style="font-size:10px">3</text>
+      </svg>
+      <div class="note">③ Dán đúng địa chỉ này (chạm để chọn hết rồi copy):<br><code>https://leducminh2310.github.io/*</code><br>rồi bấm <b>DONE</b>.</div>
+    </article>
+
+    <article class="step">
+      <header><span class="num k">6</span><h3>Chỉ cho dùng Drive: <b>Restrict key</b> → <b>Google Drive API</b> → <b>SAVE</b></h3></header>
+      <svg class="win" viewBox="0 0 320 220" role="img" aria-label="Mục API restrictions, khoanh đỏ Restrict key, ô Google Drive API và nút SAVE">
+        <use href="#win" width="320" height="220"/><use href="#gcHead" width="320" height="220"/>
+        <text class="t u" x="58" y="17">console.cloud.google.com/apis/credentials/key/…</text>
+        <text class="t b" x="16" y="76" style="font-size:10px">API restrictions</text>
+        <circle cx="22" cy="94" r="4.5" fill="none" stroke="#5f6368"/><text class="t" x="32" y="97.5" style="font-size:10px">Don't restrict key</text>
+        <circle cx="22" cy="112" r="4.5" fill="none" stroke="#1a73e8" stroke-width="1.5"/><circle class="gbtn" cx="22" cy="112" r="2.5"/>
+        <text class="t b" x="32" y="115.5" style="font-size:10px">Restrict key</text>
+        <rect x="32" y="124" width="200" height="26" rx="4" fill="#fff" stroke="#80868b"/>
+        <text class="t" x="40" y="141" style="font-size:11px">Google Drive API</text><text class="t s" x="224" y="141" text-anchor="end">▾</text>
+        <rect class="gbtn" x="16" y="176" width="56" height="26" rx="4"/><text class="t w b c" x="44" y="193" style="font-size:11px">SAVE</text>
+        <rect class="hlc" x="13" y="103" width="88" height="18" rx="5"/>
+        <circle class="badge" cx="102" cy="104" r="8"/><text class="t w b c" x="102" y="107.5" style="font-size:10px">1</text>
+        <rect class="hlc" x="28" y="120" width="208" height="34" rx="6"/>
+        <circle class="badge" cx="237" cy="121" r="8"/><text class="t w b c" x="237" y="124.5" style="font-size:10px">2</text>
+        <rect class="hlc pulse" x="11" y="171" width="66" height="36" rx="7"/>
+        <circle class="badge" cx="77" cy="172" r="8"/><text class="t w b c" x="77" y="175.5" style="font-size:10px">3</text>
+        <text class="finger" x="84" y="198" style="font-size:20px">👈</text>
+      </svg>
+      <p class="note">② Bấm vào ô, gõ <b>drive</b>, tích <b>Google Drive API</b> → <b>OK</b>. Không thấy Google Drive API? Làm lại bước 1–2 để bật API trước.</p>
+    </article>
+
+    <article class="step">
+      <header><span class="num k">7</span><h3>Dán key vào trang <b>Mr.MinhDepTrai</b></h3></header>
+      <svg class="win" viewBox="0 0 320 220" role="img" aria-label="Trang Mr.MinhDepTrai, khoanh đỏ mục Google API key và ô dán key">
+        <use href="#win" width="320" height="220"/>
+        <text class="t u" x="58" y="17">leducminh2310.github.io/MinhDepTrai01</text>
+        <path d="M1 27h318v181a10 10 0 0 1-10 10H11a10 10 0 0 1-10-10z" fill="#f5f5f7"/>
+        <rect x="16" y="36" width="288" height="40" rx="8" fill="url(#brandG)"/>
+        <text x="104" y="61" style="font: 400 11px Pacifico, cursive" fill="#ffd166">Mr.</text>
+        <text x="126" y="62" style="font: 900 16px 'Be Vietnam Pro', sans-serif" fill="url(#nameG)">MinhDepTrai</text>
+        <rect x="16" y="84" width="236" height="24" rx="6" fill="#fff" stroke="#d2d2d7"/>
+        <text class="t s" x="24" y="100" style="font-size:10px">Dán link thư mục Google Drive…</text>
+        <rect x="258" y="84" width="46" height="24" rx="6" fill="#0a84ff"/><text class="t w b c" x="281" y="100" style="font-size:11px">Xem</text>
+        <text class="t s" x="16" y="129" style="font-size:10px">▾ Google API key</text>
+        <rect x="16" y="136" width="288" height="26" rx="6" fill="#fff" stroke="#0a84ff" stroke-width="1.5"/>
+        <text class="t m" x="24" y="153" style="font-size:10.5px">AIzaSyB3x•••••••••••••</text>
+        <rect class="hlc" x="12" y="117" width="92" height="17" rx="5"/>
+        <circle class="badge" cx="105" cy="118" r="8"/><text class="t w b c" x="105" y="121.5" style="font-size:10px">1</text>
+        <rect class="hlc pulse" x="11" y="131" width="298" height="36" rx="8"/>
+        <circle class="badge" cx="300" cy="132" r="8"/><text class="t w b c" x="300" y="135.5" style="font-size:10px">2</text>
+      </svg>
+      <p class="note">① Bấm <b>Google API key</b> để mở ô. ② Chạm giữ vào ô → <b>Dán</b>. Trình duyệt sẽ nhớ key cho lần sau.</p>
+      <p class="note">💡 Muốn mọi máy đều không phải nhập: gắn key vào dòng <b>const API_KEY</b> trong file <b>index.html</b>.</p>
     </article>
   </div>
 </div>
