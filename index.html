@@ -25,7 +25,10 @@
   .brand { position: relative; text-align: center; padding: 28px 8px 22px; margin-bottom: 14px;
            border-radius: 22px; overflow: hidden; isolation: isolate;
            background: linear-gradient(135deg, #1a1033, #2b1250 45%, #0f2a4a); color: #fff;
-           box-shadow: 0 10px 30px rgba(80, 40, 160, .25); }
+           box-shadow: 0 10px 30px rgba(80, 40, 160, .25);
+           display: block; text-decoration: none; -webkit-tap-highlight-color: transparent;
+           transition: transform .15s; }
+  .brand:active { transform: scale(.98); }
   .brand .glow { position: absolute; inset: -40%; z-index: -1; opacity: .55;
                  background: radial-gradient(circle at 25% 30%, #ff5f9e 0, transparent 35%),
                              radial-gradient(circle at 75% 70%, #3ad7ff 0, transparent 35%),
@@ -128,11 +131,11 @@
 </head>
 <body>
 <header>
-  <div class="brand">
+  <a class="brand" href="./" aria-label="Mr.MinhDepTrai: về trang chính">
     <div class="glow" aria-hidden="true"></div>
     <h1 class="logo"><span class="mr">Mr.</span><span class="name">MinhDepTrai</span></h1>
     <p class="tagline">Tải ảnh từ Google Drive về điện thoại <span class="spark">✨</span></p>
-  </div>
+  </a>
   <form id="form">
     <input id="link" type="text" inputmode="url" autocomplete="off"
            placeholder="Dán link thư mục Google Drive…" required>
