@@ -69,6 +69,9 @@
   .help li { margin: 4px 0; }
   .help p { margin: 6px 0; }
   .help .tip { color: var(--muted); }
+  .help .linkbtn { display: block; text-align: center; padding: 10px 12px; margin: 8px 0 4px;
+                   border-radius: 10px; background: var(--accent); color: var(--accent-text);
+                   font-weight: 600; text-decoration: none; }
   .help a { color: var(--accent); }
   .help code { background: var(--bg); padding: 1px 4px; border-radius: 4px; font-size: 13px; word-break: break-all; }
   #status { color: var(--muted); font-size: 14px; min-height: 20px; margin: 10px 0 0; }
@@ -120,31 +123,22 @@
   <details class="help">
     <summary>📖 Hướng dẫn</summary>
 
-    <h3>1. Lấy Google API key (miễn phí)</h3>
-    <ol>
-      <li>Mở <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">console.cloud.google.com</a> và đăng nhập tài khoản Google.</li>
-      <li>Bấm chọn project ở thanh trên cùng → <b>New Project</b> → đặt tên bất kỳ → <b>Create</b>.</li>
-      <li>Vào <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com" target="_blank" rel="noopener">trang Google Drive API</a> → bấm <b>Enable</b> (Bật).</li>
-      <li>Vào <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">APIs &amp; Services → Credentials</a> → <b>Create credentials</b> → <b>API key</b>.</li>
-      <li>Sao chép key (dạng <code>AIza…</code>) và dán vào ô <b>Google API key</b> ở trên. Trình duyệt sẽ tự nhớ cho lần sau.</li>
-    </ol>
-    <p class="tip">🔒 Nên bấm <b>Edit API key</b> để giới hạn: mục <i>API restrictions</i> chỉ chọn <b>Google Drive API</b>,
-      mục <i>Website restrictions</i> thêm tên miền web của bạn (ví dụ <code>https://ten-ban.github.io/*</code>).</p>
+    <div id="keyHelp">
+      <h3>Lấy API key (làm 1 lần)</h3>
+      <a class="linkbtn" href="https://console.cloud.google.com/flows/enableapi?apiid=drive.googleapis.com&amp;hl=en" target="_blank" rel="noopener">① Bật Google Drive API ↗</a>
+      <p class="tip">Chọn project bất kỳ → <b>Next</b> → <b>Enable</b>.</p>
+      <a class="linkbtn" href="https://console.cloud.google.com/apis/credentials?hl=en" target="_blank" rel="noopener">② Tạo API key ↗</a>
+      <p class="tip"><b>+ Create credentials</b> → <b>API key</b> → copy key (dạng <code>AIza…</code>) → dán vào ô <b>Google API key</b> ở trên.</p>
+    </div>
 
-    <h3>2. Chia sẻ thư mục "Bất kỳ ai có đường liên kết"</h3>
-    <p><b>Trên máy tính</b> (drive.google.com):</p>
+    <h3>Chia sẻ thư mục ảnh</h3>
+    <a class="linkbtn" href="https://drive.google.com/drive/my-drive?hl=en" target="_blank" rel="noopener">Mở Google Drive ↗</a>
     <ol>
-      <li>Chuột phải vào thư mục → <b>Chia sẻ</b> → <b>Chia sẻ</b>.</li>
-      <li>Ở mục <b>Quyền truy cập chung</b>, đổi "Bị hạn chế" thành <b>Bất kỳ ai có đường liên kết</b>, vai trò <b>Người xem</b>.</li>
-      <li>Bấm <b>Sao chép đường liên kết</b> → <b>Xong</b>, rồi dán link vào ô ở trên.</li>
+      <li>Chuột phải vào thư mục (điện thoại: bấm <b>⋮</b>) → <b>Share</b>.</li>
+      <li>Mục <b>General access</b>: đổi <i>Restricted</i> thành <b>Anyone with the link</b>.</li>
+      <li>Bấm <b>Copy link</b> → dán vào ô ở trên → <b>Xem</b>.</li>
     </ol>
-    <p><b>Trên điện thoại</b> (app Google Drive):</p>
-    <ol>
-      <li>Bấm dấu <b>⋮</b> cạnh thư mục → <b>Chia sẻ</b> → <b>Quyền truy cập chung</b> (hoặc "Quản lý quyền truy cập").</li>
-      <li>Đổi "Bị hạn chế" thành <b>Bất kỳ ai có đường liên kết</b>.</li>
-      <li>Quay lại, bấm <b>⋮</b> → <b>Sao chép đường liên kết</b>.</li>
-    </ol>
-    <p class="tip">💡 Ảnh nằm trong thư mục con sẽ không hiện, hãy dán link của đúng thư mục chứa ảnh.</p>
+    <p class="tip">💡 Ảnh trong thư mục con sẽ không hiện, hãy dán link của đúng thư mục chứa ảnh.</p>
   </details>
   <p id="status"></p>
 </header>
@@ -183,7 +177,7 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, v); } catch {} }
 };
 
-if (API_KEY) $('#keyBox').hidden = true;
+if (API_KEY) $('#keyBox').hidden = $('#keyHelp').hidden = true;
 $('#key').value = store.get('driveKey');
 $('#link').value = new URLSearchParams(location.search).get('folder') || store.get('driveLink');
 if (!API_KEY && !$('#key').value) $('#keyBox').open = true;
