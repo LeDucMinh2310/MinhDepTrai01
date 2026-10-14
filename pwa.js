@@ -9,6 +9,7 @@
   const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const inApp = /FBAN|FBAV|FB_IAB|Instagram|Zalo|Line\/|Messenger|MicroMessenger|TikTok/i.test(ua);
+  const samsung = /SamsungBrowser/i.test(ua);
   let prompt = null;
 
   const buttons = () => document.querySelectorAll('[data-install]');
@@ -28,6 +29,11 @@
       <ol><li>Bấm nút <b>Chia sẻ</b> <span style="font-size:20px">⬆︎</span> (ô vuông có mũi tên, ở thanh dưới hoặc trên).</li>
       <li>Kéo xuống, chọn <b>Thêm vào MH chính</b> (Add to Home Screen).</li>
       <li>Bấm <b>Thêm</b> ở góc phải. Icon app sẽ hiện trên màn hình chính.</li></ol>`;
+    if (samsung) return `
+      <p>Trên <b>Samsung Internet</b>:</p>
+      <ol><li>Nếu trên thanh địa chỉ có biểu tượng <b>⬇︎ cài app</b>, bấm vào đó rồi bấm <b>Cài đặt</b>.</li>
+      <li>Nếu không có: bấm nút <b>≡</b> (Menu) ở góc dưới bên phải.</li>
+      <li>Chọn <b>Thêm trang vào</b> → <b>Màn hình chờ</b> (màn hình chính) → <b>Thêm</b>.</li></ol>`;
     return `
       <p>Mở trang bằng <b>Chrome</b> rồi:</p>
       <ol><li>Bấm nút <b>⋮</b> ở góc trên bên phải.</li>
