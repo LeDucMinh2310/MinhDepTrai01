@@ -8,19 +8,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
   :root {
     --bg: #f5f5f7; --card: #fff; --text: #1d1d1f; --muted: #6e6e73; --line: #e2e2e7;
-    --accent: #0a84ff; --danger: #d70015; --gold: #ffd166;
+    --accent: #0a84ff; --danger: #d70015; --good: #1e8e3e; --gold: #ffd166;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #000; --card: #1c1c1e; --text: #f5f5f7; --muted: #a1a1a6; --line: #2c2c2e; --danger: #ff453a; }
+    :root { --bg: #000; --card: #1c1c1e; --text: #f5f5f7; --muted: #a1a1a6; --line: #2c2c2e;
+            --danger: #ff453a; --good: #30d158; }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--text); }
   body { font: 16px/1.4 "Be Vietnam Pro", -apple-system, "Segoe UI", Roboto, sans-serif;
          -webkit-tap-highlight-color: transparent; }
-  button { font: inherit; cursor: pointer; border: 0; }
+  button, input { font: inherit; }
+  button { cursor: pointer; border: 0; }
   button:disabled { opacity: .4; cursor: default; }
   [hidden] { display: none !important; }
 
@@ -28,14 +31,14 @@
          flex-direction: column; gap: 8px; padding: calc(10px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom)); }
   .bar { display: flex; align-items: center; gap: 8px; }
   .bar h1 { flex: 1; margin: 0; font-size: 18px; font-weight: 900; text-align: center; }
-  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 8px 13px; border-radius: 999px;
-          background: var(--card); border: 1px solid var(--line); color: var(--accent); font-weight: 700;
-          font-size: 14px; text-decoration: none; white-space: nowrap; }
-  .bar .spacer { width: 96px; }
+  .pill { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 13px;
+          border-radius: 999px; background: var(--card); border: 1px solid var(--line); color: var(--accent);
+          font-weight: 700; font-size: 14px; text-decoration: none; white-space: nowrap; }
+  .bar .snd { width: 96px; justify-content: flex-end; display: flex; }
 
-  /* ===== Màn hình chọn chế độ ===== */
-  .setup { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
-  .hero { border-radius: 24px; padding: 26px 18px; text-align: center; color: #fff;
+  /* ===== Các màn hình trước khi chơi ===== */
+  .screen { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
+  .hero { border-radius: 24px; padding: 24px 18px; text-align: center; color: #fff;
           background: radial-gradient(ellipse at 50% 0%, #2bb673, #0d5233 75%);
           box-shadow: inset 0 0 0 5px #6b3e1f, 0 10px 26px rgba(13, 82, 51, .3); }
   .fan { --cw: 46px; display: flex; justify-content: center; height: 72px; margin-bottom: 4px; }
@@ -47,24 +50,70 @@
   .fan .card:nth-child(4) { transform: rotate(18deg); }
   .hero h2 { margin: 6px 0 2px; font-size: 26px; font-weight: 900; }
   .hero p { margin: 0; opacity: .85; }
+  .big { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 16px;
+         border-radius: 20px; background: var(--card); border: 1px solid var(--line) !important; color: var(--text); }
+  .big .ico { font-size: 34px; width: 56px; height: 56px; display: grid; place-items: center; border-radius: 16px; flex: none; }
+  .big .ico.bot { background: linear-gradient(135deg, #4a7bd8, #3ad7ff); }
+  .big .ico.fr { background: linear-gradient(135deg, #ff5f9e, #ffb36b); }
+  .big b { display: block; font-size: 19px; }
+  .big small { color: var(--muted); font-size: 14px; }
   .panel { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 18px; }
   .panel h3 { margin: 0 0 10px; font-size: 17px; }
+  .panel h3 + .seg { margin-bottom: 4px; }
   .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
-  .seg button { padding: 14px 6px; border-radius: 14px; background: var(--bg); color: var(--text);
+  .seg button { padding: 13px 6px; border-radius: 14px; background: var(--bg); color: var(--text);
                 font-weight: 700; font-size: 18px; border: 2px solid var(--line); }
   .seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .seg small { display: block; font-weight: 500; font-size: 12px; opacity: .8; }
   .note { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+  .note.err { color: var(--danger); font-weight: 700; }
+  .note.ok { color: var(--good); font-weight: 700; }
   .primary { padding: 15px; border-radius: 16px; background: var(--accent); color: #fff; font-weight: 800; font-size: 18px; }
+  .back-link { align-self: flex-start; }
+  .sw { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); cursor: pointer; }
+  .sw:first-of-type { border-top: 0; }
+  .sw input { appearance: none; -webkit-appearance: none; flex: none; width: 50px; height: 30px; border-radius: 999px;
+              background: var(--line); position: relative; transition: background .2s; margin: 2px 0 0; cursor: pointer; }
+  .sw input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%;
+                     background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .3); transition: transform .2s; }
+  .sw input:checked { background: var(--good); }
+  .sw input:checked::after { transform: translateX(20px); }
+  .sw input:disabled { opacity: .4; }
+  .sw b { display: block; }
+  .sw small { color: var(--muted); font-size: 14px; }
+  .field { width: 100%; padding: 13px 14px; border-radius: 14px; border: 2px solid var(--line);
+           background: var(--bg); color: var(--text); font-size: 18px; }
+  .field:focus { outline: none; border-color: var(--accent); }
+  label.lbl { display: block; font-weight: 700; margin-bottom: 8px; }
+  .or { text-align: center; color: var(--muted); font-size: 14px; margin: 4px 0; }
+  .joinrow { display: flex; gap: 8px; }
+  .joinrow .field { text-transform: uppercase; letter-spacing: 3px; font-weight: 800; }
+  .joinrow button { flex: none; padding: 0 20px; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 800; }
   .rules summary { font-weight: 700; cursor: pointer; }
   .rules ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); font-size: 15px; }
   .rules li { margin: 5px 0; }
   .rules b { color: var(--text); }
 
+  /* Phòng chờ */
+  .code { text-align: center; }
+  .code small { color: var(--muted); }
+  .code b { display: block; font-size: 40px; letter-spacing: 8px; font-weight: 900; color: var(--accent); }
+  .invite { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .invite button { padding: 12px; border-radius: 14px; font-weight: 800; }
+  .link { margin-top: 10px; font-size: 13px; color: var(--muted); word-break: break-all; text-align: center; user-select: all; }
+  .members { list-style: none; margin: 0; padding: 0; }
+  .members li { display: flex; align-items: center; gap: 10px; padding: 9px 2px; border-top: 1px solid var(--line); }
+  .members li:first-child { border-top: 0; }
+  .members .av { font-size: 26px; }
+  .members .who { flex: 1; font-weight: 700; }
+  .tag { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--bg); color: var(--muted); }
+  .members li.empty-seat { color: var(--muted); }
+
   /* ===== Bàn chơi ===== */
   .game { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-  .tools { display: flex; align-items: center; gap: 8px; }
-  #score { flex: 1; min-width: 0; font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tools { display: flex; align-items: center; gap: 6px; }
+  #scoreBtn { flex: 1; min-width: 0; justify-content: flex-start; overflow: hidden; color: var(--text); }
+  #scoreBtn span { overflow: hidden; text-overflow: ellipsis; }
   .table { flex: 1; min-height: 240px; display: grid; grid-template-columns: 76px 1fr 76px;
            grid-template-rows: auto 1fr; gap: 6px; padding: 12px 10px; border-radius: 24px;
            background: radial-gradient(ellipse at center, #22945c, #0d5233 72%);
@@ -75,14 +124,15 @@
   .center { grid-column: 2; grid-row: 2; min-width: 0; display: flex; flex-direction: column; align-items: center;
             justify-content: center; gap: 10px; color: #fff; --cw: clamp(38px, 10.5vw, 56px); }
   .table.two .center { grid-column: 1 / 4; }
-  .seat { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 66px; color: #fff;
+  .seat { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 66px; max-width: 120px; color: #fff;
           padding: 7px 8px; border-radius: 16px; background: rgba(0, 0, 0, .2); transition: box-shadow .2s; }
-  #pos-top .seat { flex-direction: row; gap: 8px; padding: 6px 12px; }
+  #pos-top .seat { flex-direction: row; gap: 8px; padding: 6px 12px; max-width: none; }
   .seat.turn { box-shadow: 0 0 0 3px var(--gold), 0 0 18px rgba(255, 209, 102, .55); }
   .seat.done { opacity: .75; }
+  .seat.off { opacity: .6; }
   .av { font-size: 26px; line-height: 1; }
-  .nm { font-size: 13px; font-weight: 700; white-space: nowrap; }
-  .cnt { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 800; }
+  .nm { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+  .cnt { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 14px; font-weight: 800; }
   .back { width: 14px; height: 20px; border-radius: 3px; border: 1.5px solid #fff;
           background: repeating-linear-gradient(45deg, #c0392b 0 3px, #e74c3c 3px 6px); }
   .st { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: rgba(255, 255, 255, .22); white-space: nowrap; }
@@ -92,6 +142,9 @@
   .pile.many .card + .card { margin-left: calc(var(--cw) * -0.6); }
   .pile .card { animation: drop .28s ease-out; }
   @keyframes drop { from { transform: translateY(-16px) scale(1.08); } }
+  .table.boom { animation: boom .45s; }
+  @keyframes boom { 20% { transform: translate(-6px, 2px) rotate(-.6deg); } 45% { transform: translate(6px, -2px) rotate(.6deg); }
+                    70% { transform: translate(-3px, 1px); } }
 
   .msg { min-height: 22px; text-align: center; font-size: 15px; font-weight: 700; }
   .msg.err { color: var(--danger); animation: shake .3s; }
@@ -104,7 +157,7 @@
   .hand { --cw: clamp(44px, 13.4vw, 66px); display: flex; flex-direction: column; gap: 12px; padding-top: 18px;
           min-height: calc(var(--cw) * 1.4 + 18px); }
   .row { display: flex; justify-content: center; }
-  .empty { margin: auto; color: var(--muted); font-weight: 700; }
+  .empty { margin: auto; color: var(--muted); font-weight: 700; text-align: center; }
   .actions { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 8px; margin-top: 12px; }
   .actions button { padding: 13px 6px; border-radius: 14px; font-weight: 800; font-size: 16px; }
   .ghost { background: var(--bg); color: var(--text); border: 2px solid var(--line) !important; }
@@ -122,18 +175,21 @@
   .hand .card { cursor: pointer; }
   .hand .card.sel { transform: translateY(-15px); box-shadow: 0 0 0 3px var(--accent), 0 6px 12px rgba(0, 0, 0, .3); }
 
-  /* ===== Kết quả ===== */
-  dialog { border: 0; border-radius: 22px; padding: 22px; width: min(400px, calc(100% - 32px));
+  /* ===== Hộp thoại ===== */
+  dialog { border: 0; border-radius: 22px; padding: 22px; width: min(420px, calc(100% - 32px));
            background: var(--card); color: var(--text); }
   dialog::backdrop { background: rgba(0, 0, 0, .55); }
   dialog h2 { margin: 0 0 4px; font-size: 22px; text-align: center; }
-  dialog .sub { margin: 0 0 14px; text-align: center; color: var(--muted); }
+  dialog .sub { margin: 0 0 12px; text-align: center; color: var(--muted); }
   .ranks { list-style: none; margin: 0; padding: 0; }
   .ranks li { display: flex; align-items: center; gap: 10px; padding: 10px 4px; border-bottom: 1px solid var(--line); }
   .ranks li:last-child { border-bottom: 0; }
   .ranks .md { font-size: 24px; }
-  .ranks .who { flex: 1; font-weight: 700; }
-  .ranks .left { color: var(--muted); font-size: 14px; }
+  .ranks .who { flex: 1; min-width: 0; font-weight: 700; }
+  .ranks .who small { display: block; font-weight: 500; color: var(--muted); font-size: 13px; }
+  .pts { font-weight: 900; font-size: 18px; }
+  .pts.up { color: var(--good); } .pts.down { color: var(--danger); }
+  .pot { margin: 10px 0 0; padding: 10px 12px; border-radius: 14px; background: var(--bg); font-size: 14px; text-align: center; }
   dialog .btns { display: grid; gap: 8px; margin-top: 16px; }
 </style>
 </head>
@@ -142,52 +198,92 @@
   <header class="bar">
     <a class="pill" href="../../">← Trang chủ</a>
     <h1>🃏 Tiến lên</h1>
-    <span class="spacer"></span>
+    <span class="snd"><button class="pill" id="soundBtn" aria-label="Bật/tắt âm thanh">🔊</button></span>
   </header>
 
-  <!-- Chọn chế độ -->
-  <section class="setup" id="setup">
+  <!-- Màn hình đầu: chọn chơi với máy hay với bạn -->
+  <section class="screen" id="scr-menu">
     <div class="hero">
       <div class="fan" id="fan"></div>
       <h2>Tiến lên miền Nam</h2>
-      <p>Bạn đấu với máy. Ai hết bài trước là thắng!</p>
+      <p>Ai hết bài trước là thắng!</p>
     </div>
-    <div class="panel">
-      <h3>Số người chơi</h3>
-      <div class="seg" id="segPlayers">
-        <button data-v="2">2 người<small>Bạn + 1 máy</small></button>
-        <button data-v="4">4 người<small>Bạn + 3 máy</small></button>
-      </div>
-      <p class="note" id="note4">Chia hết bộ bài: mỗi người 13 lá.</p>
-      <div id="perBox">
-        <h3 style="margin-top:16px">Số quân mỗi người</h3>
-        <div class="seg" id="segPer">
-          <button data-v="10">10</button><button data-v="15">15</button><button data-v="20">20</button>
-        </div>
-      </div>
-    </div>
-    <button class="primary" id="startBtn">Bắt đầu chơi</button>
+    <button class="big" id="soloBtn"><span class="ico bot">🤖</span>
+      <span><b>Chơi với máy</b><small>Đấu với 1 hoặc 3 máy, chơi ngay</small></span></button>
+    <button class="big" id="friendsBtn"><span class="ico fr">👥</span>
+      <span><b>Chơi với bạn bè</b><small>Tạo phòng, gửi link mời bạn vào đánh</small></span></button>
     <details class="panel rules">
-      <summary>📖 Luật chơi</summary>
+      <summary>📖 Luật chơi & tính điểm</summary>
       <ul>
         <li>Lá nhỏ → lớn: <b>3 4 5 6 7 8 9 10 J Q K A 2</b>. Lá <b>2</b> gọi là <b>heo</b>, lớn nhất.</li>
         <li>Cùng số thì so chất: <b>♠ bích &lt; ♣ chuồn &lt; ♦ rô &lt; ♥ cơ</b>.</li>
         <li>Các bộ: <b>rác</b> (1 lá), <b>đôi</b>, <b>sám</b> (3 lá cùng số), <b>tứ quý</b>, <b>sảnh</b> (từ 3 lá liên tiếp, không có heo), <b>đôi thông</b> (từ 3 đôi liên tiếp, không có heo).</li>
         <li>Chặn bằng bộ <b>cùng loại, cùng số lá</b> nhưng lá cao nhất lớn hơn.</li>
         <li><b>Chặt heo:</b> 3 đôi thông chặt 1 heo · tứ quý chặt heo, đôi heo, 3 đôi thông · 4 đôi thông chặt được cả heo, đôi heo, 3 đôi thông và tứ quý.</li>
-        <li>Đã <b>bỏ lượt</b> thì không được đánh tiếp trong vòng đó. Khi mọi người bỏ hết, người đánh cuối được đi vòng mới.</li>
+        <li>Đã <b>bỏ lượt</b> thì không được đánh tiếp trong vòng đó.</li>
         <li>Ván đầu: ai giữ lá nhỏ nhất (thường là <b>3♠</b>) đi trước và phải đánh kèm lá đó. Ván sau: người thắng đi trước.</li>
-        <li><b>Tới trắng</b> (chơi 4 người): có tứ quý heo, sảnh rồng (3 → A), 6 đôi hoặc 5 đôi thông là thắng luôn.</li>
+        <li><b>Tới trắng</b> (chơi 4 người): tứ quý heo, sảnh rồng (3 → A), 6 đôi hoặc 5 đôi thông là thắng luôn.</li>
+        <li><b>Điểm:</b> 4 người: Nhất +3, Nhì +1, Ba −1, Bét −3 · 2 người: Thắng +2, Thua −2 · Tới trắng: mỗi người thua −3.</li>
+        <li><b>Thối heo</b> (nếu bật): hết ván mà còn giữ heo thì bị phạt, heo đen (♠ ♣) −1, heo đỏ (♦ ♥) −2, người Nhất ăn.</li>
+        <li><b>Cúng heo ván sau</b> (nếu bật): điểm thối heo bỏ vào <b>hũ 🍯</b>, ván sau ai về Nhất thì ăn cả hũ.</li>
       </ul>
     </details>
   </section>
 
+  <!-- Chơi với máy -->
+  <section class="screen" id="scr-solo" hidden>
+    <button class="pill back-link" data-go="menu">← Quay lại</button>
+    <div id="slot-solo"></div>
+    <button class="primary" id="soloStartBtn">Bắt đầu chơi</button>
+  </section>
+
+  <!-- Chơi với bạn bè: nhập tên, tạo hoặc vào phòng -->
+  <section class="screen" id="scr-friends" hidden>
+    <button class="pill back-link" data-go="menu">← Quay lại</button>
+    <div class="panel">
+      <label class="lbl" for="nameInput">Tên của bạn</label>
+      <input class="field" id="nameInput" maxlength="16" autocomplete="nickname" placeholder="Ví dụ: Minh">
+    </div>
+    <div class="panel" id="joinPanel">
+      <h3 id="joinTitle">Vào phòng của bạn bè</h3>
+      <div class="joinrow">
+        <input class="field" id="codeInput" maxlength="5" autocomplete="off" placeholder="MÃ PHÒNG">
+        <button id="joinBtn">Vào</button>
+      </div>
+    </div>
+    <div class="or" id="orText">hoặc</div>
+    <button class="primary" id="createBtn">➕ Tạo phòng mới</button>
+    <p class="note" id="friendsMsg"></p>
+  </section>
+
+  <!-- Phòng chờ -->
+  <section class="screen" id="scr-lobby" hidden>
+    <button class="pill back-link" id="leaveLobbyBtn">← Rời phòng</button>
+    <div class="panel">
+      <div class="code"><small>Mã phòng</small><b id="roomCode">-----</b></div>
+      <div class="invite" id="inviteBox">
+        <button class="ghost" id="shareBtn">📤 Mời bạn</button>
+        <button class="ghost" id="copyBtn">📋 Copy link</button>
+      </div>
+      <div class="link" id="inviteLink"></div>
+      <p class="note" id="lobbyMsg"></p>
+    </div>
+    <div class="panel">
+      <h3 id="memTitle">Người chơi</h3>
+      <ul class="members" id="members"></ul>
+    </div>
+    <div id="slot-lobby"></div>
+    <div class="panel" id="guestSettings" hidden></div>
+    <button class="primary" id="hostStartBtn">Bắt đầu</button>
+    <p class="note" id="guestWait" style="text-align:center" hidden>⏳ Đang chờ chủ phòng bắt đầu…</p>
+  </section>
+
   <!-- Bàn chơi -->
-  <section class="game" id="game" hidden>
+  <section class="game" id="scr-game" hidden>
     <div class="tools">
-      <span id="score"></span>
+      <button class="pill" id="scoreBtn"><span id="scoreText">🏆</span></button>
       <button class="pill" id="newBtn">⟲ Ván mới</button>
-      <button class="pill" id="modeBtn">⚙️ Chế độ</button>
+      <button class="pill" id="exitBtn">⏏︎ Thoát</button>
     </div>
     <div class="table" id="table">
       <div id="pos-top"></div>
@@ -208,20 +304,62 @@
   </section>
 </div>
 
+<!-- Phần cài đặt dùng chung (được chuyển vào màn chơi với máy hoặc phòng chờ) -->
+<div hidden>
+<div class="panel" id="settings">
+  <h3>Số người chơi</h3>
+  <div class="seg" id="segPlayers">
+    <button data-v="2">2 người<small id="sub2"></small></button>
+    <button data-v="4">4 người<small id="sub4"></small></button>
+  </div>
+  <p class="note" id="note4">Chia hết bộ bài: mỗi người 13 lá.</p>
+  <div id="perBox">
+    <h3 style="margin-top:16px">Số quân mỗi người</h3>
+    <div class="seg" id="segPer">
+      <button data-v="10">10</button><button data-v="15">15</button><button data-v="20">20</button>
+    </div>
+  </div>
+  <h3 style="margin-top:18px">Luật phạt</h3>
+  <label class="sw"><input type="checkbox" id="optThoi">
+    <span><b>Thối heo</b><small>Hết ván còn giữ heo bị phạt: heo đen −1, heo đỏ −2.</small></span></label>
+  <label class="sw"><input type="checkbox" id="optCung">
+    <span><b>Cúng heo ván sau</b><small>Điểm thối heo bỏ vào hũ 🍯, ván sau ai về Nhất thì ăn cả hũ.</small></span></label>
+</div>
+</div>
+
 <dialog id="result">
   <h2 id="resTitle"></h2>
   <p class="sub" id="resSub"></p>
   <ul class="ranks" id="resList"></ul>
+  <div class="pot" id="resPot" hidden></div>
   <div class="btns">
     <button class="primary" id="againBtn">Chơi ván mới</button>
-    <button class="pill" id="resModeBtn" style="justify-content:center">⚙️ Đổi chế độ</button>
+    <p class="note" id="resWait" style="text-align:center" hidden>⏳ Chờ chủ phòng chia ván mới…</p>
+    <button class="pill" id="resCloseBtn">Xem bàn</button>
+  </div>
+</dialog>
+
+<dialog id="scoreDlg">
+  <h2>🏆 Bảng điểm</h2>
+  <p class="sub" id="scoreSub"></p>
+  <ul class="ranks" id="scoreList"></ul>
+  <div class="pot" id="scorePot" hidden></div>
+  <div class="btns">
+    <button class="pill" id="resetScoreBtn">🗑 Xoá điểm, chơi lại từ đầu</button>
+    <button class="primary" id="scoreCloseBtn">Đóng</button>
   </div>
 </dialog>
 
 <script>
 const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
 
-// ===== Lá bài: số 0..51, hạng = số >> 2 (0 là 3, 12 là 2), chất = số & 3 (♠ ♣ ♦ ♥) =====
+// ================= Lá bài & luật =================
+// Lá bài là số 0..51: hạng = số >> 2 (0 là 3, 12 là 2), chất = số & 3 (♠ ♣ ♦ ♥)
 const RANKS = ['3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A', '2'];
 const SUITS = ['♠', '♣', '♦', '♥'];
 const HEO = 12;
@@ -311,64 +449,181 @@ function instantWin(hand) {
   return null;
 }
 
-// ===== Trạng thái ván =====
-const G = { n: 4, per: 13, players: [], turn: 0, current: null, passed: new Set(), order: [],
-            mustCard: null, over: true, lastWinner: null, token: 0 };
-const selected = new Set();
-const AVATARS = ['🙂', '🤖', '👾', '🦊'];
+function checkMove(cards, current, mustCard) {
+  if (!cards.length) return 'Chạm vào lá bài để chọn trước đã.';
+  const cb = classify(cards);
+  if (!cb) return 'Bộ này không hợp lệ: phải là rác, đôi, sám, tứ quý, sảnh hoặc đôi thông.';
+  if (mustCard != null && !cards.includes(mustCard)) return `Lượt đầu phải đánh kèm lá ${label(mustCard)}.`;
+  if (current && !beats(cb, current.combo)) return `Không chặn được ${comboName(current.combo)} trên bàn.`;
+  return null;
+}
 
-const store = {
-  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+// ================= Máy chơi =================
+// ctx = { current, mustCard, minOpp } — dùng chung cho máy, nút gợi ý của chủ phòng và khách
+function cost(x, hand) {
+  const cnt = Array(13).fill(0), used = Array(13).fill(0);
+  hand.forEach(c => cnt[rankOf(c)]++);
+  x.cards.forEach(c => used[rankOf(c)]++);
+  let c = x.combo.top;
+  x.cards.forEach(k => { if (rankOf(k) === HEO) c += 40; });
+  if (isBomb(x.combo)) c += 80;
+  used.forEach((u, r) => { if (u && cnt[r] > u) c += 8; }); // ngại tách đôi, sám
+  return c;
+}
+
+function chooseMove(hand, ctx, strategic) {
+  const cands = allCombos(hand);
+  const finish = cands.find(x => x.cards.length === hand.length
+    && (!ctx.current || beats(x.combo, ctx.current.combo))
+    && (ctx.mustCard == null || x.cards.includes(ctx.mustCard)));
+  if (finish) return finish.cards;
+  if (!ctx.current) return chooseLead(hand, cands, ctx);
+
+  const valid = cands.filter(x => beats(x.combo, ctx.current.combo));
+  if (!valid.length) return null;
+  valid.sort((a, b) => cost(a, hand) - cost(b, hand));
+  const best = valid[0];
+  if (strategic) {
+    const pricey = best.cards.some(c => rankOf(c) === HEO) || isBomb(best.combo);
+    if (pricey && !isHeo(ctx.current.combo) && ctx.minOpp > 3 && hand.length > 5) return null; // để dành heo, bom
+  }
+  return best.cards;
+}
+
+function chooseLead(hand, cands, ctx) {
+  const must = ctx.mustCard;
+  let pool;
+  if (must != null) {
+    pool = cands.filter(x => x.cards.includes(must) && !isBomb(x.combo));
+    if (!pool.length) pool = cands.filter(x => x.cards.includes(must));
+  } else {
+    const non2 = hand.filter(c => rankOf(c) !== HEO);
+    const low = (non2.length ? non2 : hand)[0];
+    pool = cands.filter(x => x.cards.includes(low) && !isBomb(x.combo));
+    if (!pool.length) pool = cands.filter(x => x.cards.includes(low));
+  }
+  if (ctx.minOpp === 1) { // đối thủ còn 1 lá: tránh đánh rác nhỏ
+    const multi = cands.filter(x => x.cards.length > 1 && !isBomb(x.combo) && (must == null || x.cards.includes(must)));
+    if (multi.length) pool = multi;
+    else if (must == null) return [hand[hand.length - 1]];
+  }
+  pool.sort((a, b) => b.cards.length - a.cards.length || a.combo.top - b.combo.top);
+  return pool[0].cards;
+}
+
+// ================= Âm thanh (tạo bằng Web Audio, không cần file) =================
+const Sfx = {
+  ctx: null,
+  on: store.get('tlmn-sound', true),
+  init() {
+    if (!this.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) this.ctx = new AC(); }
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  tone(freq, dur, { type = 'sine', vol = .2, at = 0, slide = null } = {}) {
+    const c = this.ctx;
+    if (!c || !this.on) return;
+    const t = c.currentTime + at, o = c.createOscillator(), g = c.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + dur);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    o.connect(g).connect(c.destination);
+    o.start(t); o.stop(t + dur + .02);
+  },
+  noise(dur, { vol = .3, at = 0, freq = 2500 } = {}) {
+    const c = this.ctx;
+    if (!c || !this.on) return;
+    const t = c.currentTime + at, len = Math.floor(c.sampleRate * dur);
+    const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len) ** 2;
+    const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = .8; g.gain.value = vol;
+    s.connect(f).connect(g).connect(c.destination);
+    s.start(t);
+  },
+  card(at = 0) { this.noise(.07, { at, vol: .4, freq: 3200 }); this.tone(170, .06, { at, vol: .08 }); },
+  deal() { for (let i = 0; i < 10; i++) this.card(i * .055); },
+  pass() { this.tone(420, .09, { type: 'triangle', vol: .12 }); this.tone(300, .12, { type: 'triangle', vol: .1, at: .08 }); },
+  turn() { this.tone(880, .14, { vol: .12 }); this.tone(1320, .22, { vol: .12, at: .12 }); },
+  chop() { this.noise(.45, { vol: .7, freq: 300 }); this.tone(110, .7, { vol: .35, slide: 32 }); this.tone(220, .3, { type: 'sawtooth', vol: .1, slide: 60 }); },
+  finish() { this.tone(784, .15, { type: 'triangle', vol: .14 }); this.tone(1175, .28, { type: 'triangle', vol: .14, at: .1 }); },
+  win() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, .25, { type: 'triangle', vol: .15, at: i * .12 })); this.tone(1047, .7, { type: 'triangle', vol: .12, at: .5 }); },
+  lose() { [392, 330, 262, 196].forEach((f, i) => this.tone(f, .32, { type: 'triangle', vol: .13, at: i * .18 })); },
+  error() { this.tone(150, .18, { type: 'square', vol: .07 }); },
+  blip() { this.tone(660, .08, { vol: .1 }); this.tone(990, .12, { vol: .1, at: .07 }); }
 };
+['pointerdown', 'touchend', 'click'].forEach(t => addEventListener(t, () => Sfx.init(), { passive: true }));
+function renderSound() { $('#soundBtn').textContent = Sfx.on ? '🔊' : '🔇'; }
+$('#soundBtn').addEventListener('click', () => {
+  Sfx.on = !Sfx.on; store.set('tlmn-sound', Sfx.on); renderSound();
+  if (Sfx.on) { Sfx.init(); Sfx.blip(); }
+});
+renderSound();
+
+// ================= Bộ máy ván bài (chạy ở máy chơi một mình hoặc máy chủ phòng) =================
+const HUMAN_AV = ['😎', '🐼', '🐯', '🐸'], BOT_AV = ['🤖', '👾', '🦊'];
+let SEQ = Date.now() % 100000; // số thứ tự sự kiện, không lặp lại giữa các phòng
+const G = { n: 4, per: 13, settings: {}, players: [], turn: 0, current: null, passed: new Set(), order: [],
+            mustCard: null, over: true, lastWinner: null, scores: [], pot: 0, ev: null, result: null, timer: 0, token: 0 };
 
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
   return a;
 }
-
 const alive = () => [...Array(G.n).keys()].filter(i => G.players[i].hand.length);
 const nextAlive = from => { let k = from; do k = (k + 1) % G.n; while (!G.players[k].hand.length); return k; };
-const myTurn = () => !G.over && G.turn === 0 && G.players[0].hand.length > 0;
-const placeName = p => G.n === 2 ? (p === 1 ? 'Thắng' : 'Thua') : ['', 'Nhất', 'Nhì', 'Ba', 'Bét'][p];
-const placeText = p => G.n === 2 ? placeName(p).toLowerCase() : `về ${placeName(p)}`;
+const isAuto = p => p.kind === 'bot' || (p.kind === 'remote' && !p.connected);
+
+// players: [{ name, kind: 'local' | 'remote' | 'bot', cid, conn }]
+function initEngine(settings, players, saved) {
+  G.token++;
+  clearTimeout(G.timer);
+  G.settings = { ...settings };
+  G.n = settings.n;
+  G.per = settings.n === 4 ? 13 : settings.per;
+  let b = 0, h = 0;
+  G.players = players.map(p => ({ ...p, avatar: p.kind === 'bot' ? BOT_AV[b++] : HUMAN_AV[h++], hand: [], place: 0, connected: true }));
+  G.lastWinner = null;
+  G.scores = saved?.scores?.length === G.n ? saved.scores : Array(G.n).fill(0);
+  G.pot = saved?.pot || 0;
+  G.over = true;
+}
+
+function ctxFor(i) {
+  const opp = G.players.filter((q, k) => k !== i && q.hand.length).map(q => q.hand.length);
+  return { current: G.current, mustCard: G.mustCard, minOpp: opp.length ? Math.min(...opp) : 99 };
+}
 
 function newGame() {
   G.token++;
-  closeResult();
+  clearTimeout(G.timer);
   const deck = shuffle([...Array(52).keys()]);
-  G.players = Array.from({ length: G.n }, (_, i) => ({
-    name: i ? `Máy ${i}` : 'Bạn', avatar: AVATARS[i], bot: i > 0, place: 0,
-    hand: deck.slice(i * G.per, (i + 1) * G.per).sort(byId)
-  }));
-  G.current = null; G.passed = new Set(); G.order = []; G.over = false;
-  selected.clear();
+  G.players.forEach((p, i) => { p.hand = deck.slice(i * G.per, (i + 1) * G.per).sort(byId); p.place = 0; });
+  G.current = null; G.passed = new Set(); G.order = []; G.over = false; G.result = null;
 
   for (let k = 0; k < G.n; k++) {
     const i = ((G.lastWinner ?? 0) + k) % G.n, how = instantWin(G.players[i].hand);
     if (how) return instantFinish(i, how);
   }
-
-  if (G.lastWinner != null) {
+  const fromWin = G.lastWinner != null;
+  if (fromWin) {
     G.turn = G.lastWinner; G.mustCard = null;
-    say(G.turn === 0 ? 'Bạn thắng ván trước nên được đi trước.' : `${G.players[G.turn].name} thắng ván trước nên đi trước.`);
   } else {
     let low = 99;
     G.players.forEach((p, i) => { if (p.hand[0] < low) { low = p.hand[0]; G.turn = i; } });
     G.mustCard = low;
-    say(G.turn === 0 ? `Bạn giữ lá nhỏ nhất ${label(low)}, đi trước và nhớ đánh kèm lá này.`
-                     : `${G.players[G.turn].name} giữ lá nhỏ nhất ${label(low)} nên đi trước.`);
   }
-  render();
+  G.ev = { seq: ++SEQ, kind: 'start', by: G.turn, must: G.mustCard, fromWin };
+  publish();
   schedule();
 }
 
 function instantFinish(i, how) {
   G.over = true; G.order = [i]; G.players[i].place = 1; G.lastWinner = i;
-  addScore(i);
-  say(`${G.players[i].name} tới trắng: ${how}!`);
-  render();
-  setTimeout(() => showResult(`${i === 0 ? 'Bạn' : G.players[i].name} tới trắng!`, `Có ${how} nên thắng luôn.`), 500);
+  settle(i, how);
+  G.ev = { seq: ++SEQ, kind: 'instant', by: i, how, end: true };
+  publish();
 }
 
 function play(i, cards) {
@@ -376,20 +631,15 @@ function play(i, cards) {
   p.hand = p.hand.filter(c => !cards.includes(c));
   G.current = { cards: [...cards].sort(byId), combo: cb, by: i };
   G.mustCard = null;
-  let text = `${p.name} đánh ${comboName(cb)}`;
-  if (prev && cb.type !== prev.combo.type) text = `💥 ${p.name} chặt ${comboName(prev.combo)} bằng ${comboName(cb)}!`;
-  if (!p.hand.length) {
-    G.order.push(i); p.place = G.order.length;
-    text += ` · ${p.name} hết bài, ${placeText(p.place)}!`;
-  }
-  say(text);
+  G.ev = { seq: ++SEQ, kind: 'play', by: i, combo: cb, chopOf: prev && cb.type !== prev.combo.type ? prev.combo : null, place: 0 };
+  if (!p.hand.length) { G.order.push(i); p.place = G.order.length; G.ev.place = p.place; }
   if ((G.n === 2 && G.order.length) || alive().length <= 1) return endGame();
   advance(i);
 }
 
 function pass(i) {
   G.passed.add(i);
-  say(`${G.players[i].name} bỏ lượt`);
+  G.ev = { seq: ++SEQ, kind: 'pass', by: i };
   advance(i);
 }
 
@@ -406,7 +656,7 @@ function advance(from) {
     do k = (k + 1) % G.n; while (!contenders.includes(k));
     G.turn = k;
   }
-  render();
+  publish();
   schedule();
 }
 
@@ -415,122 +665,300 @@ function endGame() {
   alive().sort((a, b) => G.players[a].hand.length - G.players[b].hand.length)
          .forEach(i => { G.order.push(i); G.players[i].place = G.order.length; });
   G.lastWinner = G.order[0];
-  addScore(G.order[0]);
-  render();
-  const w = G.order[0];
-  setTimeout(() => showResult(w === 0 ? '🎉 Bạn thắng rồi!' : `${G.players[w].name} thắng ván này`,
-                              w === 0 ? 'Quá đỉnh, Mr.MinhDepTrai!' : 'Ván sau gỡ lại nhé!'), 700);
+  settle(null);
+  G.ev.end = true;
+  publish();
 }
 
-// ===== Máy chơi =====
-function cost(x, hand) {
-  const cnt = Array(13).fill(0), used = Array(13).fill(0);
-  hand.forEach(c => cnt[rankOf(c)]++);
-  x.cards.forEach(c => used[rankOf(c)]++);
-  let c = x.combo.top;
-  x.cards.forEach(k => { if (rankOf(k) === HEO) c += 40; });
-  if (isBomb(x.combo)) c += 80;
-  used.forEach((u, r) => { if (u && cnt[r] > u) c += 8; }); // ngại tách đôi, sám
-  return c;
-}
-
-function chooseMove(i, strategic) {
-  const hand = G.players[i].hand;
-  const opp = G.players.filter((q, k) => k !== i && q.hand.length).map(q => q.hand.length);
-  const minOpp = opp.length ? Math.min(...opp) : 99;
-  const cands = allCombos(hand);
-  const finish = cands.find(x => x.cards.length === hand.length
-    && (!G.current || beats(x.combo, G.current.combo))
-    && (G.mustCard == null || x.cards.includes(G.mustCard)));
-  if (finish) return finish.cards;
-  if (!G.current) return chooseLead(hand, cands, minOpp);
-
-  const valid = cands.filter(x => beats(x.combo, G.current.combo));
-  if (!valid.length) return null;
-  valid.sort((a, b) => cost(a, hand) - cost(b, hand));
-  const best = valid[0];
-  if (strategic) {
-    const pricey = best.cards.some(c => rankOf(c) === HEO) || isBomb(best.combo);
-    if (pricey && !isHeo(G.current.combo) && minOpp > 3 && hand.length > 5) return null; // để dành heo, bom
-  }
-  return best.cards;
-}
-
-function chooseLead(hand, cands, minOpp) {
-  let pool;
-  if (G.mustCard != null) {
-    pool = cands.filter(x => x.cards.includes(G.mustCard) && !isBomb(x.combo));
-    if (!pool.length) pool = cands.filter(x => x.cards.includes(G.mustCard));
+// Tính điểm cuối ván, kể cả thối heo và hũ cúng heo
+function settle(instantBy, how) {
+  const n = G.n, d = Array(n).fill(0), notes = Array.from({ length: n }, () => []);
+  const w = instantBy ?? G.order[0];
+  if (instantBy != null) {
+    for (let k = 0; k < n; k++) if (k !== w) { d[k] -= 3; d[w] += 3; }
   } else {
-    const non2 = hand.filter(c => rankOf(c) !== HEO);
-    const low = (non2.length ? non2 : hand)[0];
-    pool = cands.filter(x => x.cards.includes(low) && !isBomb(x.combo));
-    if (!pool.length) pool = cands.filter(x => x.cards.includes(low));
+    const pts = n === 4 ? [3, 1, -1, -3] : [2, -2];
+    G.order.forEach((p, k) => { d[p] += pts[k]; });
   }
-  if (minOpp === 1) { // đối thủ còn 1 lá: tránh đánh rác nhỏ
-    const multi = cands.filter(x => x.cards.length > 1 && !isBomb(x.combo)
-      && (G.mustCard == null || x.cards.includes(G.mustCard)));
-    if (multi.length) pool = multi;
-    else if (G.mustCard == null) return [hand[hand.length - 1]];
+  const potTaken = G.pot;
+  if (potTaken) { d[w] += potTaken; notes[w].push(`ăn hũ +${potTaken}`); G.pot = 0; }
+
+  let thoi = 0;
+  if (G.settings.thoi && instantBy == null) {
+    G.players.forEach((p, i) => {
+      const heo = p.hand.filter(c => rankOf(c) === HEO);
+      if (!heo.length) return;
+      const v = heo.reduce((s, c) => s + (suitOf(c) >= 2 ? 2 : 1), 0);
+      d[i] -= v; thoi += v;
+      notes[i].push(`thối ${heo.map(label).join(' ')}: −${v}`);
+    });
+    if (thoi && !G.settings.cung) { d[w] += thoi; notes[w].push(`ăn thối heo +${thoi}`); }
+    if (thoi && G.settings.cung) G.pot += thoi;
   }
-  pool.sort((a, b) => b.cards.length - a.cards.length || a.combo.top - b.combo.top);
-  return pool[0].cards;
+  d.forEach((x, i) => { G.scores[i] += x; });
+  const rows = [...G.order, ...G.players.map((p, i) => i).filter(i => !G.order.includes(i))]
+    .map(i => ({ seat: i, place: G.players[i].place, delta: d[i], notes: notes[i], left: G.players[i].hand.length }));
+  G.result = { instant: how || null, winner: w, rows, potTaken, potAdded: G.settings.cung ? thoi : 0, pot: G.pot };
+  if (mode === 'solo') store.set(soloKey(), { scores: G.scores, pot: G.pot });
 }
 
 function schedule() {
-  if (G.over || !G.players[G.turn].bot) return;
-  const t = G.token, fast = !G.players[0].hand.length;
-  setTimeout(() => {
+  clearTimeout(G.timer);
+  if (G.over || !isAuto(G.players[G.turn])) return;
+  const t = G.token;
+  const humansPlaying = G.players.some(q => q.hand.length && !isAuto(q));
+  G.timer = setTimeout(() => {
     if (t !== G.token || G.over) return;
-    const i = G.turn, move = chooseMove(i, true);
+    const i = G.turn, p = G.players[i];
+    if (!isAuto(p)) return;
+    const move = chooseMove(p.hand, ctxFor(i), true);
     move ? play(i, move) : pass(i);
-  }, fast ? 450 : 950);
+  }, humansPlaying ? 950 : 450);
 }
 
-// ===== Người chơi =====
-function checkMove(cards) {
-  if (!cards.length) return 'Chạm vào lá bài để chọn trước đã.';
-  const cb = classify(cards);
-  if (!cb) return 'Bộ này không hợp lệ: phải là rác, đôi, sám, tứ quý, sảnh hoặc đôi thông.';
-  if (G.mustCard != null && !cards.includes(G.mustCard)) return `Lượt đầu phải đánh kèm lá ${label(G.mustCard)}.`;
-  if (G.current && !beats(cb, G.current.combo)) return `Không chặn được ${comboName(G.current.combo)} trên bàn.`;
+// Người chơi (máy này hoặc khách) gửi nước đi; trả về lỗi nếu không hợp lệ
+function engineAct(seat, a) {
+  if (G.over || G.turn !== seat) return 'Chưa tới lượt bạn.';
+  if (a.a === 'pass') {
+    if (!G.current) return 'Bạn đang được đánh tự do, không bỏ lượt được.';
+    pass(seat);
+    return null;
+  }
+  const hand = G.players[seat].hand;
+  const cards = Array.isArray(a.cards) ? [...new Set(a.cards.map(Number))] : [];
+  if (!cards.every(c => hand.includes(c))) return 'Bài không hợp lệ.';
+  const err = checkMove(cards, G.current, G.mustCard);
+  if (err) return err;
+  play(seat, cards);
   return null;
 }
 
-$('#playBtn').addEventListener('click', () => {
-  if (!myTurn()) return;
-  const cards = [...selected].sort(byId);
-  const err = checkMove(cards);
-  if (err) return say(err, true);
-  selected.clear();
-  play(0, cards);
-});
+function viewFor(seat) {
+  return {
+    room: room?.code || null, me: seat, n: G.n, per: G.per, settings: G.settings,
+    players: G.players.map(p => ({ name: p.name, avatar: p.avatar, count: p.hand.length, place: p.place,
+                                   bot: p.kind === 'bot', online: p.kind !== 'remote' || p.connected })),
+    hand: G.players[seat].hand.slice(), turn: G.turn, current: G.current, passed: [...G.passed],
+    over: G.over, mustCard: G.mustCard, ev: G.ev, scores: G.scores.slice(), pot: G.pot,
+    result: G.over ? G.result : null
+  };
+}
 
-$('#passBtn').addEventListener('click', () => {
-  if (!myTurn() || !G.current) return;
-  selected.clear();
-  pass(0);
-});
+function publish() {
+  onView(viewFor(0));
+  if (mode !== 'host') return;
+  G.players.forEach((p, i) => {
+    if (p.kind === 'remote' && p.connected && p.conn?.open) p.conn.send({ t: 'state', view: viewFor(i) });
+  });
+}
 
-$('#hintBtn').addEventListener('click', () => {
-  if (!myTurn()) return;
-  const move = chooseMove(0, false);
-  selected.clear();
-  if (!move) { renderHand(); return say('Không có bài chặn được, bấm "Bỏ lượt" nhé.'); }
-  move.forEach(c => selected.add(c));
-  renderHand();
-  say(`Gợi ý: ${comboName(classify(move))}. Bấm "Đánh" nếu đồng ý.`);
-});
+// ================= Kết nối phòng (PeerJS: máy chủ phòng giữ ván, khách gửi nước đi) =================
+let mode = 'solo';            // 'solo' | 'host' | 'guest'
+let peer = null, hostConn = null, room = null;
+const ID_PREFIX = 'mrminhdeptrai-tlmn-';
+const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+// Mã riêng của tab này: tải lại trang vẫn giữ (để vào lại đúng ghế), tab khác là người khác
+const myCid = (() => {
+  const fresh = Math.random().toString(36).slice(2, 10);
+  try {
+    const c = sessionStorage.getItem('tlmn-cid') || fresh;
+    sessionStorage.setItem('tlmn-cid', c);
+    return c;
+  } catch { return fresh; }
+})();
+const makeCode = () => Array.from({ length: 5 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join('');
+const cleanName = s => String(s || '').replace(/\s+/g, ' ').trim().slice(0, 16);
+const inviteUrl = () => `${location.origin}${location.pathname}?room=${room.code}`;
 
-$('#hand').addEventListener('click', e => {
-  const el = e.target.closest('.card');
-  if (!el) return;
-  const c = +el.dataset.c;
-  selected.has(c) ? selected.delete(c) : selected.add(c);
-  el.classList.toggle('sel', selected.has(c));
-});
+function readName() {
+  const name = cleanName($('#nameInput').value);
+  if (!name) { friendsMsg('Nhập tên của bạn trước đã nhé.', true); $('#nameInput').focus(); Sfx.error(); return null; }
+  store.set('tlmn-name', name);
+  return name;
+}
 
-// ===== Vẽ giao diện =====
+function leaveRoom() {
+  if (mode === 'host' && room) {
+    const conns = new Set([...room.members.map(m => m.conn), ...G.players.map(p => p.conn)]);
+    conns.forEach(c => { try { c?.open && c.send({ t: 'closed' }); } catch {} });
+  }
+  const old = peer;
+  peer = null; hostConn = null; room = null; mode = 'solo';
+  G.token++; clearTimeout(G.timer); G.over = true;
+  if (old) setTimeout(() => { try { old.destroy(); } catch {} }, 300);
+}
+
+function needPeer() {
+  if (window.Peer) return true;
+  friendsMsg('Không tải được phần kết nối. Kiểm tra mạng rồi tải lại trang.', true);
+  return false;
+}
+
+// ----- Chủ phòng -----
+function createRoom() {
+  const name = readName();
+  if (!name || !needPeer()) return;
+  leaveRoom();
+  mode = 'host';
+  room = { code: makeCode(), started: false, members: [{ cid: myCid, name, conn: null }] };
+  syncHostSettings();
+  show('lobby');
+  openHostPeer();
+}
+
+function openHostPeer() {
+  lobbyMsg('Đang tạo phòng…');
+  const p = peer = new Peer(ID_PREFIX + room.code.toLowerCase());
+  p.on('open', () => { if (peer === p) { lobbyMsg('Phòng đã sẵn sàng, gửi link mời bạn bè nhé!', 'ok'); renderLobby(); } });
+  p.on('error', e => {
+    if (peer !== p) return;
+    if (e.type === 'unavailable-id') { p.destroy(); room.code = makeCode(); openHostPeer(); renderLobby(); return; }
+    if (e.type === 'peer-unavailable') return;
+    lobbyMsg('Lỗi kết nối: ' + (e.type || e.message) + '. Thử tạo phòng lại nhé.', 'err');
+  });
+  p.on('disconnected', () => { if (peer === p && !p.destroyed) setTimeout(() => { try { p.reconnect(); } catch {} }, 1000); });
+  p.on('connection', conn => {
+    conn.on('data', d => hostOnData(conn, d));
+    conn.on('close', () => hostOnClose(conn));
+  });
+  renderLobby();
+}
+
+function syncHostSettings() { if (mode === 'host' && room) room.settings = { ...setup }; }
+
+function hostOnData(conn, d) {
+  if (!room || mode !== 'host' || !d || typeof d !== 'object') return;
+  if (d.t === 'hello') {
+    const name = cleanName(d.name) || 'Bạn mới';
+    const cid = String(d.cid || '').slice(0, 20);
+    if (room.started) { // đang chơi: chỉ cho người cũ vào lại ghế của mình
+      const seat = G.players.findIndex(p => p.kind === 'remote' && p.cid === cid);
+      if (seat < 0) return reject(conn, 'Phòng đang chơi, đợi ván sau hoặc nhờ chủ phòng tạo phòng mới nhé.');
+      Object.assign(G.players[seat], { conn, connected: true, name });
+      const m = room.members.find(x => x.cid === cid);
+      if (m) m.conn = conn;
+      conn.send({ t: 'welcome', code: room.code });
+      publish();
+      schedule();
+      return;
+    }
+    const m = room.members.find(x => x.cid === cid);
+    if (m) Object.assign(m, { conn, name });
+    else if (room.members.length >= room.settings.n) return reject(conn, 'Phòng đã đủ người rồi.');
+    else room.members.push({ cid, name, conn });
+    conn.send({ t: 'welcome', code: room.code });
+    Sfx.blip();
+    broadcastLobby();
+    renderLobby();
+  } else if (d.t === 'act') {
+    const seat = G.players.findIndex(p => p.conn === conn);
+    if (seat < 0) return;
+    const err = engineAct(seat, d);
+    if (err) conn.send({ t: 'error', msg: err });
+  }
+}
+
+function reject(conn, msg) {
+  conn.send({ t: 'reject', msg });
+  setTimeout(() => conn.close(), 500);
+}
+
+function hostOnClose(conn) {
+  if (!room || mode !== 'host') return;
+  if (room.started) {
+    const p = G.players.find(x => x.conn === conn);
+    if (!p) return;
+    p.connected = false; p.conn = null;
+    publish();
+    schedule(); // máy đánh thay khi người chơi mất kết nối
+  } else {
+    room.members = room.members.filter(m => m.conn !== conn);
+    broadcastLobby();
+    renderLobby();
+  }
+}
+
+function lobbyData(forCid) {
+  return { t: 'lobby', code: room.code, settings: room.settings,
+           members: room.members.map((m, i) => ({ name: m.name, host: i === 0, you: m.cid === forCid })) };
+}
+function broadcastLobby() {
+  room.members.forEach(m => { if (m.conn?.open) m.conn.send(lobbyData(m.cid)); });
+}
+
+function hostStart() {
+  const s = room.settings, mem = room.members;
+  if (mem.length < 2) return lobbyMsg('Cần ít nhất 2 người trong phòng.', 'err');
+  if (s.n === 2 && mem.length > 2) return lobbyMsg('Chế độ 2 người chỉ cho 2 người trong phòng.', 'err');
+  room.started = true;
+  const players = mem.map((m, i) => ({ name: m.name, kind: i === 0 ? 'local' : 'remote', cid: m.cid, conn: m.conn }));
+  while (players.length < s.n) players.push({ name: `Máy ${players.length}`, kind: 'bot' });
+  initEngine(s, players);
+  show('game');
+  newGame();
+}
+
+// ----- Khách -----
+function joinRoom(codeRaw) {
+  const code = String(codeRaw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (code.length !== 5) { friendsMsg('Mã phòng gồm 5 ký tự, kiểm tra lại nhé.', true); Sfx.error(); return; }
+  const name = readName();
+  if (!name || !needPeer()) return;
+  leaveRoom();
+  mode = 'guest';
+  room = { code, lobby: null };
+  friendsMsg(`Đang vào phòng ${code}…`);
+  const p = peer = new Peer();
+  const fail = msg => { if (peer !== p) return; leaveRoom(); show('friends'); friendsMsg(msg, true); Sfx.error(); };
+  const timer = setTimeout(() => { if (!hostConn?.open) fail('Không kết nối được tới phòng. Kiểm tra mã phòng hoặc mạng rồi thử lại.'); }, 15000);
+  p.on('open', () => {
+    const c = hostConn = p.connect(ID_PREFIX + code.toLowerCase(), { reliable: true });
+    c.on('open', () => { clearTimeout(timer); c.send({ t: 'hello', name, cid: myCid }); });
+    c.on('data', d => guestOnData(d, fail));
+    c.on('close', () => { if (mode === 'guest' && peer === p) fail('Mất kết nối với chủ phòng.'); });
+  });
+  p.on('error', e => fail(e.type === 'peer-unavailable' ? `Không tìm thấy phòng ${code}. Có thể chủ phòng đã thoát hoặc mã sai.` : 'Lỗi kết nối: ' + e.type));
+}
+
+function guestOnData(d, fail) {
+  if (!d || typeof d !== 'object') return;
+  if (d.t === 'welcome') { friendsMsg(''); }
+  else if (d.t === 'lobby') {
+    room.lobby = d;
+    if (current !== 'game') { show('lobby'); renderLobby(); Sfx.blip(); }
+  } else if (d.t === 'state') {
+    if (current !== 'game') show('game');
+    onView(d.view);
+  } else if (d.t === 'error') { say(String(d.msg), true); Sfx.error(); }
+  else if (d.t === 'reject') fail(String(d.msg));
+  else if (d.t === 'closed') fail('Chủ phòng đã đóng phòng.');
+}
+
+// ================= Giao diện =================
+let current = 'menu', V = null;
+const selected = new Set();
+const SCREENS = ['menu', 'solo', 'friends', 'lobby', 'game'];
+
+function show(name) {
+  current = name;
+  SCREENS.forEach(s => { $(`#scr-${s}`).hidden = s !== name; });
+  if (name === 'solo') $('#slot-solo').appendChild($('#settings'));
+  if (name === 'lobby' && mode === 'host') $('#slot-lobby').appendChild($('#settings'));
+  if (name !== 'game') { closeDlg('#result'); closeDlg('#scoreDlg'); }
+  renderSettings();
+  scrollTo(0, 0);
+}
+function closeDlg(sel) { if ($(sel).open) $(sel).close(); }
+
+function friendsMsg(text, err = false) {
+  $('#friendsMsg').textContent = text;
+  $('#friendsMsg').className = 'note' + (err ? ' err' : '');
+}
+function lobbyMsg(text, cls = '') {
+  $('#lobbyMsg').textContent = text;
+  $('#lobbyMsg').className = 'note' + (cls ? ' ' + cls : '');
+}
+
 function cardEl(c, extra = '') {
   const el = document.createElement('div');
   el.className = `card${suitOf(c) >= 2 ? ' red' : ''} ${extra}`;
@@ -546,55 +974,107 @@ function say(text, err = false) {
   if (err) { void m.offsetWidth; m.classList.add('err'); }
 }
 
+const nm = i => i === V.me ? 'Bạn' : V.players[i].name;
+const placeName = (p, n = V.n) => n === 2 ? (p === 1 ? 'Thắng' : 'Thua') : ['', 'Nhất', 'Nhì', 'Ba', 'Bét'][p];
+const placeText = p => V.n === 2 ? placeName(p).toLowerCase() : `về ${placeName(p)}`;
+const myTurn = () => V && !V.over && V.turn === V.me && V.hand.length > 0;
+const signed = x => x > 0 ? `+${x}` : x < 0 ? `−${-x}` : '0';
+
+function describe(ev) {
+  if (ev.kind === 'start') {
+    if (ev.fromWin) return `${nm(ev.by)} thắng ván trước nên đi trước.`;
+    return ev.by === V.me ? `Bạn giữ lá nhỏ nhất ${label(ev.must)}, đi trước và nhớ đánh kèm lá này.`
+                          : `${nm(ev.by)} giữ lá nhỏ nhất ${label(ev.must)} nên đi trước.`;
+  }
+  if (ev.kind === 'instant') return `${nm(ev.by)} tới trắng: ${ev.how}!`;
+  if (ev.kind === 'pass') return `${nm(ev.by)} bỏ lượt`;
+  let t = ev.chopOf ? `💥 ${nm(ev.by)} chặt ${comboName(ev.chopOf)} bằng ${comboName(ev.combo)}!`
+                    : `${nm(ev.by)} đánh ${comboName(ev.combo)}`;
+  if (ev.place) t += ` · ${nm(ev.by)} hết bài, ${placeText(ev.place)}!`;
+  return t;
+}
+
+// Nhận trạng thái mới (từ bộ máy trên máy này hoặc từ chủ phòng)
+function onView(nv) {
+  const prev = V;
+  V = nv;
+  const evKey = v => v?.ev ? `${v.room}:${v.ev.seq}` : '';
+  if (V.ev && evKey(V) !== evKey(prev)) {
+    const ev = V.ev;
+    say(describe(ev));
+    if (ev.kind === 'start') { closeDlg('#result'); Sfx.deal(); }
+    else if (ev.kind === 'pass') Sfx.pass();
+    else if (ev.kind === 'play') {
+      if (ev.chopOf) { Sfx.chop(); $('#table').classList.remove('boom'); void $('#table').offsetWidth; $('#table').classList.add('boom'); }
+      else Sfx.card();
+      if (ev.place && ev.by === V.me && !ev.end) setTimeout(() => Sfx.finish(), 250);
+    }
+    if (ev.end) setTimeout(() => {
+      if (!V.over || evKey(V) !== evKey(nv)) return;
+      showResult();
+      V.result.winner === V.me ? Sfx.win() : Sfx.lose();
+    }, 800);
+  }
+  if (myTurn() && !(prev && !prev.over && prev.turn === prev.me && evKey(prev) === evKey(V))) setTimeout(() => myTurn() && Sfx.turn(), 300);
+  render();
+}
+
 function seatEl(i) {
-  const p = G.players[i], el = document.createElement('div');
-  const turn = !G.over && G.turn === i;
-  el.className = `seat${turn ? ' turn' : ''}${p.place ? ' done' : ''}`;
-  const st = p.place ? placeName(p.place) : G.passed.has(i) ? 'Bỏ lượt' : turn ? 'Đang nghĩ…' : '';
-  el.innerHTML = `<div class="av">${p.avatar}</div><div><div class="nm">${p.name}</div>
-    <div class="cnt"><span class="back"></span>${p.hand.length}</div></div>${st ? `<div class="st">${st}</div>` : ''}`;
+  const p = V.players[i], el = document.createElement('div');
+  const turn = !V.over && V.turn === i;
+  el.className = `seat${turn ? ' turn' : ''}${p.place ? ' done' : ''}${p.online ? '' : ' off'}`;
+  const st = p.place ? placeName(p.place) : !p.online ? '📴 máy đánh thay' : V.passed.includes(i) ? 'Bỏ lượt' : turn ? 'Đang nghĩ…' : '';
+  el.innerHTML = `<div class="av">${esc(p.avatar)}</div><div><div class="nm">${esc(p.name)}</div>
+    <div class="cnt"><span class="back"></span>${p.count}</div></div>${st ? `<div class="st">${st}</div>` : ''}`;
   return el;
 }
 
 function render() {
-  const pos = G.n === 4 ? { 1: 'right', 2: 'top', 3: 'left' } : { 1: 'top' };
+  if (!V) return;
+  const where = V.n === 4 ? ['', 'right', 'top', 'left'] : ['', 'top'];
   ['top', 'left', 'right'].forEach(w => { $(`#pos-${w}`).innerHTML = ''; });
-  Object.entries(pos).forEach(([i, w]) => $(`#pos-${w}`).appendChild(seatEl(+i)));
-  $('#table').classList.toggle('two', G.n === 2);
+  for (let i = 0; i < V.n; i++) {
+    const rel = (i - V.me + V.n) % V.n;
+    if (rel) $(`#pos-${where[rel]}`).appendChild(seatEl(i));
+  }
+  $('#table').classList.toggle('two', V.n === 2);
 
   const center = $('#center');
   center.innerHTML = '';
   const lab = document.createElement('div');
   lab.className = 'lab';
-  if (G.current) {
-    lab.textContent = `${G.players[G.current.by].name} · ${comboName(G.current.combo)}`;
+  if (V.current) {
+    lab.textContent = `${nm(V.current.by)} · ${comboName(V.current.combo)}`;
     const pile = document.createElement('div');
-    pile.className = `pile${G.current.cards.length > 6 ? ' many' : ''}`;
-    G.current.cards.forEach(c => pile.appendChild(cardEl(c)));
+    pile.className = `pile${V.current.cards.length > 6 ? ' many' : ''}`;
+    V.current.cards.forEach(c => pile.appendChild(cardEl(c)));
     center.append(pile, lab);
-  } else if (!G.over) {
-    lab.textContent = `Vòng mới · ${G.turn === 0 ? 'Bạn' : G.players[G.turn].name} đánh trước`;
-    center.append(lab);
   } else {
-    lab.textContent = 'Hết ván';
+    lab.textContent = V.over ? 'Hết ván' : `Vòng mới · ${nm(V.turn)} đánh trước`;
     center.append(lab);
   }
 
-  const me = G.players[0];
-  const st = me.place ? placeText(me.place) : G.passed.has(0) ? 'đã bỏ lượt' : myTurn() ? (G.current ? 'tới lượt bạn' : 'bạn đánh tự do') : '';
-  $('#meInfo').innerHTML = `<span>${me.avatar} <b>Bạn</b> · ${me.hand.length} lá</span><span>${st}</span>`;
+  const me = V.players[V.me];
+  const st = me.place ? placeText(me.place) : V.passed.includes(V.me) ? 'đã bỏ lượt'
+           : myTurn() ? (V.current ? 'tới lượt bạn' : 'bạn đánh tự do') : V.over ? '' : `chờ ${nm(V.turn)}…`;
+  $('#meInfo').innerHTML = `<span>${esc(me.avatar)} <b>${esc(me.name)}</b> · ${V.hand.length} lá</span><span>${esc(st)}</span>`;
   $('#me').classList.toggle('turn', myTurn());
   $('#playBtn').disabled = $('#hintBtn').disabled = !myTurn();
-  $('#passBtn').disabled = !myTurn() || !G.current;
+  $('#passBtn').disabled = !myTurn() || !V.current;
+  $('#newBtn').hidden = mode === 'guest';
   renderHand();
   renderScore();
 }
 
 function renderHand() {
-  const box = $('#hand'), hand = G.players[0].hand;
+  const box = $('#hand'), hand = V.hand;
   [...selected].forEach(c => { if (!hand.includes(c)) selected.delete(c); });
   box.innerHTML = '';
-  if (!hand.length) { box.innerHTML = `<div class="empty">${G.players[0].place ? '🎉 Bạn đã hết bài' : ''}</div>`; return; }
+  if (!hand.length) {
+    const me = V.players[V.me];
+    box.innerHTML = `<div class="empty">${me.place ? `🎉 Bạn đã hết bài, ${placeText(me.place)}` : ''}</div>`;
+    return;
+  }
   const rows = hand.length > 13 ? 2 : 1, per = Math.ceil(hand.length / rows);
   for (let r = 0; r < rows; r++) {
     const row = document.createElement('div');
@@ -622,84 +1102,232 @@ function fitHand() {
 }
 addEventListener('resize', fitHand);
 
-// ===== Điểm (lưu trên máy này) =====
-const modeKey = () => `${G.n}p-${G.per}`;
-function addScore(i) {
-  const s = store.get('tlmn-score', {});
-  const arr = s[modeKey()] || Array(G.n).fill(0);
-  arr[i]++;
-  s[modeKey()] = arr;
-  store.set('tlmn-score', s);
-}
 function renderScore() {
-  const arr = store.get('tlmn-score', {})[modeKey()] || Array(G.n).fill(0);
-  $('#score').textContent = '🏆 ' + G.players.map((p, i) => `${p.avatar}${arr[i] || 0}`).join('  ');
-  $('#score').title = `Số ván thắng (${G.n === 4 ? '4 người' : `2 người · ${G.per} lá`}): `
-    + G.players.map((p, i) => `${p.name} ${arr[i] || 0}`).join(', ');
+  $('#scoreText').textContent = '🏆 ' + V.players.map((p, i) => `${esc(p.avatar)}${signed(V.scores[i])}`).join(' ')
+    + (V.pot ? ` · 🍯${V.pot}` : '');
 }
 
-// ===== Kết quả =====
-function showResult(title, sub) {
-  $('#resTitle').textContent = title;
-  $('#resSub').textContent = sub;
-  const medals = G.n === 2 ? ['🏆', '😢'] : ['🥇', '🥈', '🥉', '😢'];
-  $('#resList').innerHTML = G.order.map((i, k) => {
-    const p = G.players[i];
-    return `<li><span class="md">${medals[k]}</span><span class="who">${p.avatar} ${p.name}</span>
-      <span class="left">${p.hand.length ? `còn ${p.hand.length} lá` : placeName(k + 1)}</span></li>`;
+function showResult() {
+  const R = V.result;
+  if (!R) return;
+  const w = R.winner;
+  $('#resTitle').textContent = R.instant ? `${w === V.me ? 'Bạn' : V.players[w].name} tới trắng!`
+    : w === V.me ? '🎉 Bạn thắng rồi!' : `${V.players[w].name} thắng ván này`;
+  $('#resSub').textContent = R.instant ? `Có ${R.instant} nên thắng luôn.` : w === V.me ? 'Quá đỉnh!' : 'Ván sau gỡ lại nhé!';
+  const medals = V.n === 2 ? ['', '🏆', '😢'] : ['', '🥇', '🥈', '🥉', '😢'];
+  $('#resList').innerHTML = R.rows.map(r => {
+    const p = V.players[r.seat];
+    const sub = [r.left ? `còn ${r.left} lá` : '', ...r.notes].filter(Boolean).join(' · ');
+    return `<li><span class="md">${r.place ? medals[r.place] : '😢'}</span>
+      <span class="who">${esc(p.avatar)} ${esc(r.seat === V.me ? `${p.name} (bạn)` : p.name)}${sub ? `<small>${esc(sub)}</small>` : ''}</span>
+      <span class="pts ${r.delta > 0 ? 'up' : r.delta < 0 ? 'down' : ''}">${signed(r.delta)}</span></li>`;
   }).join('');
-  if (G.order.length < G.n) {
-    $('#resList').innerHTML += G.players.map((p, i) => G.order.includes(i) ? '' :
-      `<li><span class="md">😢</span><span class="who">${p.avatar} ${p.name}</span><span class="left">thua trắng</span></li>`).join('');
-  }
-  $('#result').showModal();
+  const potLines = [];
+  if (R.potTaken) potLines.push(`🍯 ${esc(nm(w))} ăn hũ ${R.potTaken} điểm`);
+  if (R.potAdded) potLines.push(`🍯 ${R.potAdded} điểm thối heo được cúng vào hũ, ván sau ai Nhất thì ăn (hũ: ${R.pot})`);
+  $('#resPot').hidden = !potLines.length;
+  $('#resPot').innerHTML = potLines.join('<br>');
+  $('#againBtn').hidden = mode === 'guest';
+  $('#resWait').hidden = mode !== 'guest';
+  if (!$('#result').open) $('#result').showModal();
 }
-function closeResult() { if ($('#result').open) $('#result').close(); }
 
-$('#againBtn').addEventListener('click', newGame);
-$('#resModeBtn').addEventListener('click', showSetup);
-$('#newBtn').addEventListener('click', () => {
-  if (!G.over && !confirm('Bỏ ván đang chơi và chia bài lại?')) return;
-  newGame();
-});
-$('#modeBtn').addEventListener('click', () => {
-  if (!G.over && !confirm('Bỏ ván đang chơi để đổi chế độ?')) return;
-  showSetup();
-});
+function showScores() {
+  if (!V) return;
+  const order = V.players.map((p, i) => i).sort((a, b) => V.scores[b] - V.scores[a]);
+  $('#scoreSub').textContent = V.n === 4 ? '4 người' : `2 người · ${V.per} lá`;
+  $('#scoreList').innerHTML = order.map((i, k) => `<li><span class="md">${['🥇', '🥈', '🥉', '·'][Math.min(k, 3)]}</span>
+    <span class="who">${esc(V.players[i].avatar)} ${esc(i === V.me ? `${V.players[i].name} (bạn)` : V.players[i].name)}</span>
+    <span class="pts ${V.scores[i] > 0 ? 'up' : V.scores[i] < 0 ? 'down' : ''}">${signed(V.scores[i])}</span></li>`).join('');
+  $('#scorePot').hidden = !V.pot;
+  $('#scorePot').textContent = `🍯 Hũ đang có ${V.pot} điểm, ván sau ai Nhất thì ăn.`;
+  $('#resetScoreBtn').hidden = mode === 'guest';
+  $('#scoreDlg').showModal();
+}
 
-// ===== Chọn chế độ =====
-const setup = store.get('tlmn-setup', { n: 4, per: 15 });
+// ----- Phòng chờ -----
+function renderLobby() {
+  if (!room) return;
+  const isHost = mode === 'host';
+  const L = isHost ? lobbyData(myCid) : room.lobby;
+  $('#roomCode').textContent = room.code;
+  $('#inviteBox').hidden = !isHost;
+  $('#inviteLink').textContent = isHost ? inviteUrl() : '';
+  if (!L) { $('#members').innerHTML = ''; return; }
+  const s = L.settings;
+  $('#memTitle').textContent = `Người chơi (${L.members.length}/${s.n})`;
+  let html = L.members.map((m, i) => `<li><span class="av">${HUMAN_AV[i] || '🙂'}</span><span class="who">${esc(m.name)}</span>
+      ${m.host ? '<span class="tag">chủ phòng</span>' : ''}${m.you ? '<span class="tag">bạn</span>' : ''}</li>`).join('');
+  for (let i = L.members.length; i < s.n; i++) {
+    html += `<li class="empty-seat"><span class="av">🤖</span><span class="who">Ghế trống${isHost && L.members.length >= 2 ? ' (máy chơi thay)' : ''}</span></li>`;
+  }
+  $('#members').innerHTML = html;
+  $('#guestSettings').hidden = isHost;
+  $('#guestSettings').innerHTML = `<h3>Luật phòng</h3><p class="note" style="margin:0">${s.n === 4 ? '4 người · mỗi người 13 lá' : `2 người · mỗi người ${s.per} lá`}<br>
+    Thối heo: <b>${s.thoi ? 'Có' : 'Không'}</b>${s.thoi ? ` · Cúng heo ván sau: <b>${s.cung ? 'Có' : 'Không'}</b>` : ''}</p>`;
+  $('#hostStartBtn').hidden = !isHost;
+  $('#guestWait').hidden = isHost;
+  if (isHost) {
+    const m = L.members.length, okCount = m >= 2 && (s.n === 4 || m === 2);
+    $('#hostStartBtn').disabled = !okCount || !peer?.open;
+    $('#hostStartBtn').textContent = m < 2 ? 'Chờ bạn bè vào phòng…'
+      : `Bắt đầu (${m} người${s.n === 4 && m < 4 ? ` + ${4 - m} máy` : ''})`;
+  }
+}
 
-function renderSetup() {
-  document.querySelectorAll('#segPlayers button').forEach(b => b.classList.toggle('on', +b.dataset.v === setup.n));
+// ----- Cài đặt -----
+const setup = Object.assign({ n: 4, per: 15, thoi: true, cung: false }, store.get('tlmn-setup', {}));
+function renderSettings() {
+  const inRoom = mode === 'host';
+  document.querySelectorAll('#segPlayers button').forEach(b => {
+    b.classList.toggle('on', +b.dataset.v === setup.n);
+    b.disabled = inRoom && +b.dataset.v === 2 && room?.members.length > 2;
+  });
   document.querySelectorAll('#segPer button').forEach(b => b.classList.toggle('on', +b.dataset.v === setup.per));
+  $('#sub2').textContent = inRoom ? 'Bạn + 1 người' : 'Bạn + 1 máy';
+  $('#sub4').textContent = inRoom ? 'Thiếu người thì máy vào thay' : 'Bạn + 3 máy';
   $('#perBox').hidden = setup.n !== 2;
   $('#note4').hidden = setup.n !== 4;
+  $('#optThoi').checked = setup.thoi;
+  $('#optCung').checked = setup.thoi && setup.cung;
+  $('#optCung').disabled = !setup.thoi;
+}
+function settingsChanged() {
+  store.set('tlmn-setup', setup);
+  renderSettings();
+  if (mode === 'host' && room && !room.started) { syncHostSettings(); broadcastLobby(); renderLobby(); }
 }
 $('#segPlayers').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  setup.n = +b.dataset.v; renderSetup();
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  setup.n = +b.dataset.v; settingsChanged();
 });
 $('#segPer').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  setup.per = +b.dataset.v; renderSetup();
+  setup.per = +b.dataset.v; settingsChanged();
 });
-$('#startBtn').addEventListener('click', () => {
-  store.set('tlmn-setup', setup);
-  G.n = setup.n; G.per = setup.n === 4 ? 13 : setup.per; G.lastWinner = null;
-  $('#setup').hidden = true; $('#game').hidden = false;
-  newGame();
-});
+$('#optThoi').addEventListener('change', e => { setup.thoi = e.target.checked; if (!setup.thoi) setup.cung = false; settingsChanged(); });
+$('#optCung').addEventListener('change', e => { setup.cung = e.target.checked; settingsChanged(); });
 
-function showSetup() {
-  G.token++; G.over = true;
-  closeResult();
-  $('#game').hidden = true; $('#setup').hidden = false;
-  renderSetup();
+// ----- Chơi với máy -----
+const soloKey = () => `tlmn-solo-${G.n}-${G.per}`;
+function startSolo() {
+  leaveRoom();
+  store.set('tlmn-setup', setup);
+  const n = setup.n;
+  const players = [{ name: store.get('tlmn-name', '') || 'Bạn', kind: 'local' }];
+  for (let i = 1; i < n; i++) players.push({ name: `Máy ${i}`, kind: 'bot' });
+  G.n = n; G.per = n === 4 ? 13 : setup.per;
+  initEngine(setup, players, store.get(soloKey(), null));
+  show('game');
+  newGame();
 }
 
+// ----- Nút bấm -----
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
+$('#soloBtn').addEventListener('click', () => show('solo'));
+$('#friendsBtn').addEventListener('click', () => { friendsMsg(''); show('friends'); });
+$('#soloStartBtn').addEventListener('click', startSolo);
+$('#createBtn').addEventListener('click', createRoom);
+$('#joinBtn').addEventListener('click', () => joinRoom($('#codeInput').value));
+$('#codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') joinRoom($('#codeInput').value); });
+$('#hostStartBtn').addEventListener('click', hostStart);
+$('#leaveLobbyBtn').addEventListener('click', () => { leaveRoom(); show('friends'); });
+
+$('#shareBtn').addEventListener('click', async () => {
+  const url = inviteUrl();
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Tiến lên miền Nam', text: `Vào đánh tiến lên với mình! Mã phòng ${room.code}`, url }); } catch {}
+  } else copyInvite();
+});
+$('#copyBtn').addEventListener('click', copyInvite);
+async function copyInvite() {
+  try { await navigator.clipboard.writeText(inviteUrl()); lobbyMsg('Đã copy link mời, dán gửi qua Zalo/Messenger nhé!', 'ok'); }
+  catch { lobbyMsg('Không copy tự động được, hãy chạm giữ vào đường link bên trên để copy.', 'err'); }
+}
+
+$('#playBtn').addEventListener('click', () => {
+  if (!myTurn()) return;
+  const cards = [...selected].sort(byId);
+  const err = checkMove(cards, V.current, V.mustCard);
+  if (err) { say(err, true); Sfx.error(); return; }
+  selected.clear();
+  act({ a: 'play', cards });
+});
+$('#passBtn').addEventListener('click', () => {
+  if (!myTurn() || !V.current) return;
+  selected.clear();
+  act({ a: 'pass' });
+});
+$('#hintBtn').addEventListener('click', () => {
+  if (!myTurn()) return;
+  const opp = V.players.filter((p, i) => i !== V.me && p.count).map(p => p.count);
+  const move = chooseMove(V.hand, { current: V.current, mustCard: V.mustCard, minOpp: opp.length ? Math.min(...opp) : 99 }, false);
+  selected.clear();
+  if (!move) { renderHand(); say('Không có bài chặn được, bấm "Bỏ lượt" nhé.'); return; }
+  move.forEach(c => selected.add(c));
+  renderHand();
+  say(`Gợi ý: ${comboName(classify(move))}. Bấm "Đánh" nếu đồng ý.`);
+});
+$('#hand').addEventListener('click', e => {
+  const el = e.target.closest('.card');
+  if (!el) return;
+  const c = +el.dataset.c;
+  selected.has(c) ? selected.delete(c) : selected.add(c);
+  el.classList.toggle('sel', selected.has(c));
+  Sfx.tone(selected.has(c) ? 900 : 600, .04, { vol: .05 });
+});
+
+function act(a) {
+  if (mode === 'guest') {
+    if (hostConn?.open) hostConn.send({ t: 'act', ...a });
+    else { say('Mất kết nối với chủ phòng.', true); Sfx.error(); }
+    return;
+  }
+  const err = engineAct(0, a);
+  if (err) { say(err, true); Sfx.error(); }
+}
+
+$('#newBtn').addEventListener('click', () => {
+  if (mode === 'guest') return;
+  if (!G.over && !confirm('Bỏ ván đang chơi và chia bài lại?')) return;
+  newGame();
+});
+$('#againBtn').addEventListener('click', () => { if (mode !== 'guest') newGame(); });
+$('#resCloseBtn').addEventListener('click', () => closeDlg('#result'));
+$('#scoreBtn').addEventListener('click', showScores);
+$('#scoreCloseBtn').addEventListener('click', () => closeDlg('#scoreDlg'));
+$('#resetScoreBtn').addEventListener('click', () => {
+  if (mode === 'guest' || !confirm('Xoá hết điểm và hũ, tính lại từ đầu?')) return;
+  G.scores = Array(G.n).fill(0); G.pot = 0;
+  if (mode === 'solo') store.set(soloKey(), { scores: G.scores, pot: 0 });
+  closeDlg('#scoreDlg');
+  publish();
+});
+$('#exitBtn').addEventListener('click', () => {
+  const q = mode === 'host' ? 'Thoát sẽ đóng phòng, mọi người cùng phải ra. Thoát nhé?'
+          : mode === 'guest' ? 'Rời phòng? Máy sẽ đánh thay bạn.' : !G.over ? 'Bỏ ván đang chơi?' : '';
+  if (q && !confirm(q)) return;
+  const wasRoom = mode !== 'solo';
+  leaveRoom();
+  show(wasRoom ? 'friends' : 'menu');
+});
+addEventListener('beforeunload', () => { if (mode === 'host') leaveRoom(); });
+
+// ----- Khởi động -----
 [44, 50, 47, 51].forEach(c => $('#fan').appendChild(cardEl(c))); // A♠ 2♦ A♥ 2♥
-renderSetup();
+$('#nameInput').value = store.get('tlmn-name', '');
+const inviteCode = new URLSearchParams(location.search).get('room');
+if (inviteCode) {
+  // Mở từ link mời: nhập tên rồi vào thẳng phòng
+  $('#codeInput').value = inviteCode.toUpperCase().slice(0, 5);
+  $('#joinTitle').textContent = `Bạn được mời vào phòng ${$('#codeInput').value}`;
+  $('#joinBtn').textContent = 'Vào phòng';
+  $('#orText').textContent = 'hoặc tự tạo phòng khác';
+  show('friends');
+  friendsMsg('Nhập tên của bạn rồi bấm "Vào phòng".');
+} else {
+  show('menu');
+}
 </script>
 </body>
 </html>
