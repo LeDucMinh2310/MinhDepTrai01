@@ -8,6 +8,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0d5233">
+<link rel="apple-touch-icon" href="../../icons/tienlen-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tiến lên">
+<script src="../../pwa.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
   :root {
@@ -55,6 +61,15 @@
   .big .ico { font-size: 34px; width: 56px; height: 56px; display: grid; place-items: center; border-radius: 16px; flex: none; }
   .big .ico.bot { background: linear-gradient(135deg, #4a7bd8, #3ad7ff); }
   .big .ico.fr { background: linear-gradient(135deg, #ff5f9e, #ffb36b); }
+  .big .ico.dl { background: linear-gradient(135deg, #22945c, #0d5233); }
+  .avs { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+  .avs button { aspect-ratio: 1; padding: 0; font-size: 24px; line-height: 1; border-radius: 12px;
+                background: var(--bg); border: 2px solid transparent; transition: transform .12s; }
+  .avs button.on { border-color: var(--accent); background: var(--card); transform: scale(1.1);
+                   box-shadow: 0 2px 8px rgba(10, 132, 255, .35); }
+  .me-pick { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .me-pick .big-av { font-size: 44px; width: 64px; height: 64px; display: grid; place-items: center;
+                     border-radius: 18px; background: var(--bg); flex: none; }
   .big b { display: block; font-size: 19px; }
   .big small { color: var(--muted); font-size: 14px; }
   .panel { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 18px; }
@@ -222,6 +237,8 @@
       <span><b>Chơi với máy</b><small>Đấu với 1 hoặc 3 máy, chơi ngay</small></span></button>
     <button class="big" id="friendsBtn"><span class="ico fr">👥</span>
       <span><b>Chơi với bạn bè</b><small>Tạo phòng, gửi link mời bạn vào đánh</small></span></button>
+    <button class="big" data-install hidden><span class="ico dl">📲</span>
+      <span><b>Tải app về điện thoại</b><small>Có icon riêng, mở nhanh, chơi với máy không cần mạng</small></span></button>
     <details class="panel rules">
       <summary>📖 Luật chơi & tính điểm</summary>
       <ul>
@@ -244,6 +261,7 @@
   <!-- Chơi với máy -->
   <section class="screen" id="scr-solo" hidden>
     <button class="pill back-link" data-go="menu">← Quay lại</button>
+    <div id="slot-profile-solo"></div>
     <div id="slot-solo"></div>
     <button class="primary" id="soloStartBtn">Bắt đầu chơi</button>
   </section>
@@ -251,10 +269,7 @@
   <!-- Chơi với bạn bè: nhập tên, tạo hoặc vào phòng -->
   <section class="screen" id="scr-friends" hidden>
     <button class="pill back-link" data-go="menu">← Quay lại</button>
-    <div class="panel">
-      <label class="lbl" for="nameInput">Tên của bạn</label>
-      <input class="field" id="nameInput" maxlength="16" autocomplete="nickname" placeholder="Ví dụ: Minh">
-    </div>
+    <div id="slot-profile-friends"></div>
     <div class="panel" id="joinPanel">
       <h3 id="joinTitle">Vào phòng của bạn bè</h3>
       <div class="joinrow">
@@ -319,6 +334,18 @@
 
 <!-- Phần cài đặt dùng chung (được chuyển vào màn chơi với máy hoặc phòng chờ) -->
 <div hidden>
+<!-- Tên và avatar: dùng chung cho màn chơi với máy và chơi với bạn bè -->
+<div class="panel" id="profile">
+  <div class="me-pick">
+    <span class="big-av" id="myAvatarBig">😎</span>
+    <div style="flex:1;min-width:0">
+      <label class="lbl" for="nameInput">Tên của bạn</label>
+      <input class="field" id="nameInput" maxlength="16" autocomplete="nickname" placeholder="Ví dụ: Minh">
+    </div>
+  </div>
+  <label class="lbl">Chọn avatar</label>
+  <div class="avs" id="avatarGrid"></div>
+</div>
 <div class="panel" id="settings">
   <h3>Số người chơi</h3>
   <div class="seg" id="segPlayers">
@@ -575,7 +602,12 @@ $('#soundBtn').addEventListener('click', () => {
 renderSound();
 
 // ================= Bộ máy ván bài (chạy ở máy chơi một mình hoặc máy chủ phòng) =================
-const HUMAN_AV = ['😎', '🐼', '🐯', '🐸'], BOT_AV = ['🤖', '👾', '🦊'];
+const HUMAN_AV = ['😎', '🐼', '🐯', '🐸'], BOT_AV = ['🤖', '👾', '👽'];
+// Avatar người chơi được chọn; chỉ nhận đúng các avatar trong danh sách này
+const AVATARS = ['😎', '🤠', '🥳', '😇', '🤓', '😈', '👻', '🤡', '🐼', '🐯', '🦁', '🐸',
+                 '🐵', '🐶', '🐱', '🐰', '🦊', '🐻', '🐨', '🐷', '🐧', '🦄', '🐲', '🐙'];
+const validAv = a => AVATARS.includes(a) ? a : null;
+let myAvatar = validAv(store.get('tlmn-avatar', '')) || '😎';
 let SEQ = Date.now() % 100000; // số thứ tự sự kiện, không lặp lại giữa các phòng
 const G = { n: 4, per: 13, settings: {}, players: [], turn: 0, current: null, passed: new Set(), order: [],
             mustCard: null, over: true, lastWinner: null, scores: [], pot: 0, ev: null, result: null, timer: 0, token: 0 };
@@ -596,7 +628,8 @@ function initEngine(settings, players, saved) {
   G.n = settings.n;
   G.per = settings.n === 4 ? 13 : settings.per;
   let b = 0, h = 0;
-  G.players = players.map(p => ({ ...p, avatar: p.kind === 'bot' ? BOT_AV[b++] : HUMAN_AV[h++], hand: [], place: 0, connected: true }));
+  G.players = players.map(p => ({ ...p, hand: [], place: 0, connected: true,
+    avatar: p.kind === 'bot' ? BOT_AV[b++] : validAv(p.avatar) || HUMAN_AV[h++ % HUMAN_AV.length] }));
   G.lastWinner = null;
   G.scores = saved?.scores?.length === G.n ? saved.scores : Array(G.n).fill(0);
   G.pot = saved?.pot || 0;
@@ -813,7 +846,7 @@ function createRoom() {
   if (!name || !needPeer()) return;
   leaveRoom();
   mode = 'host';
-  room = { code: makeCode(), started: false, members: [{ cid: myCid, name, conn: null }] };
+  room = { code: makeCode(), started: false, members: [{ cid: myCid, name, avatar: myAvatar, conn: null }] };
   syncHostSettings();
   show('lobby');
   openHostPeer();
@@ -844,10 +877,11 @@ function hostOnData(conn, d) {
   if (d.t === 'hello') {
     const name = cleanName(d.name) || 'Bạn mới';
     const cid = String(d.cid || '').slice(0, 20);
+    const avatar = validAv(d.avatar);
     if (room.started) { // đang chơi: chỉ cho người cũ vào lại ghế của mình
       const seat = G.players.findIndex(p => p.kind === 'remote' && p.cid === cid);
       if (seat < 0) return reject(conn, 'Phòng đang chơi, đợi ván sau hoặc nhờ chủ phòng tạo phòng mới nhé.');
-      Object.assign(G.players[seat], { conn, connected: true, name });
+      Object.assign(G.players[seat], { conn, connected: true, name }, avatar ? { avatar } : {});
       const m = room.members.find(x => x.cid === cid);
       if (m) m.conn = conn;
       conn.send({ t: 'welcome', code: room.code });
@@ -856,9 +890,9 @@ function hostOnData(conn, d) {
       return;
     }
     const m = room.members.find(x => x.cid === cid);
-    if (m) Object.assign(m, { conn, name });
+    if (m) Object.assign(m, { conn, name, avatar });
     else if (room.members.length >= room.settings.n) return reject(conn, 'Phòng đã đủ người rồi.');
-    else room.members.push({ cid, name, conn });
+    else room.members.push({ cid, name, avatar, conn });
     conn.send({ t: 'welcome', code: room.code });
     Sfx.blip();
     broadcastLobby();
@@ -893,7 +927,7 @@ function hostOnClose(conn) {
 
 function lobbyData(forCid) {
   return { t: 'lobby', code: room.code, settings: room.settings,
-           members: room.members.map((m, i) => ({ name: m.name, host: i === 0, you: m.cid === forCid })) };
+           members: room.members.map((m, i) => ({ name: m.name, avatar: m.avatar, host: i === 0, you: m.cid === forCid })) };
 }
 function broadcastLobby() {
   room.members.forEach(m => { if (m.conn?.open) m.conn.send(lobbyData(m.cid)); });
@@ -904,7 +938,7 @@ function hostStart() {
   if (mem.length < 2) return lobbyMsg('Cần ít nhất 2 người trong phòng.', 'err');
   if (s.n === 2 && mem.length > 2) return lobbyMsg('Chế độ 2 người chỉ cho 2 người trong phòng.', 'err');
   room.started = true;
-  const players = mem.map((m, i) => ({ name: m.name, kind: i === 0 ? 'local' : 'remote', cid: m.cid, conn: m.conn }));
+  const players = mem.map((m, i) => ({ name: m.name, avatar: m.avatar, kind: i === 0 ? 'local' : 'remote', cid: m.cid, conn: m.conn }));
   while (players.length < s.n) players.push({ name: `Máy ${players.length}`, kind: 'bot' });
   initEngine(s, players);
   show('game');
@@ -926,7 +960,7 @@ function joinRoom(codeRaw) {
   const timer = setTimeout(() => { if (!hostConn?.open) fail('Không kết nối được tới phòng. Kiểm tra mã phòng hoặc mạng rồi thử lại.'); }, 15000);
   p.on('open', () => {
     const c = hostConn = p.connect(ID_PREFIX + code.toLowerCase(), { reliable: true });
-    c.on('open', () => { clearTimeout(timer); c.send({ t: 'hello', name, cid: myCid }); });
+    c.on('open', () => { clearTimeout(timer); c.send({ t: 'hello', name, avatar: myAvatar, cid: myCid }); });
     c.on('data', d => guestOnData(d, fail));
     c.on('close', () => { if (mode === 'guest' && peer === p) fail('Mất kết nối với chủ phòng.'); });
   });
@@ -955,7 +989,8 @@ const SCREENS = ['menu', 'solo', 'friends', 'lobby', 'game'];
 function show(name) {
   current = name;
   SCREENS.forEach(s => { $(`#scr-${s}`).hidden = s !== name; });
-  if (name === 'solo') $('#slot-solo').appendChild($('#settings'));
+  if (name === 'solo') { $('#slot-profile-solo').appendChild($('#profile')); $('#slot-solo').appendChild($('#settings')); }
+  if (name === 'friends') $('#slot-profile-friends').appendChild($('#profile'));
   if (name === 'lobby' && mode === 'host') $('#slot-lobby').appendChild($('#settings'));
   if (name !== 'game') { closeDlg('#result'); closeDlg('#scoreDlg'); }
   renderSettings();
@@ -1321,7 +1356,7 @@ function renderLobby() {
   if (!L) { $('#members').innerHTML = ''; return; }
   const s = L.settings;
   $('#memTitle').textContent = `Người chơi (${L.members.length}/${s.n})`;
-  let html = L.members.map((m, i) => `<li><span class="av">${HUMAN_AV[i] || '🙂'}</span><span class="who">${esc(m.name)}</span>
+  let html = L.members.map((m, i) => `<li><span class="av">${validAv(m.avatar) || HUMAN_AV[i] || '🙂'}</span><span class="who">${esc(m.name)}</span>
       ${m.host ? '<span class="tag">chủ phòng</span>' : ''}${m.you ? '<span class="tag">bạn</span>' : ''}</li>`).join('');
   for (let i = L.members.length; i < s.n; i++) {
     html += `<li class="empty-seat"><span class="av">🤖</span><span class="who">Ghế trống${isHost && L.members.length >= 2 ? ' (máy chơi thay)' : ''}</span></li>`;
@@ -1379,7 +1414,9 @@ function startSolo() {
   leaveRoom();
   store.set('tlmn-setup', setup);
   const n = setup.n;
-  const players = [{ name: store.get('tlmn-name', '') || 'Bạn', kind: 'local' }];
+  const typed = cleanName($('#nameInput').value);
+  if (typed) store.set('tlmn-name', typed);
+  const players = [{ name: typed || store.get('tlmn-name', '') || 'Bạn', avatar: myAvatar, kind: 'local' }];
   for (let i = 1; i < n; i++) players.push({ name: `Máy ${i}`, kind: 'bot' });
   G.n = n; G.per = n === 4 ? 13 : setup.per;
   initEngine(setup, players, store.get(soloKey(), null));
@@ -1481,6 +1518,22 @@ addEventListener('beforeunload', () => { if (mode === 'host') leaveRoom(); });
 // ----- Khởi động -----
 [44, 50, 47, 51].forEach(c => $('#fan').appendChild(cardEl(c))); // A♠ 2♦ A♥ 2♥
 $('#nameInput').value = store.get('tlmn-name', '');
+
+// Bảng chọn avatar
+function renderAvatars() {
+  $('#myAvatarBig').textContent = myAvatar;
+  $('#avatarGrid').innerHTML = AVATARS.map(a =>
+    `<button type="button" class="${a === myAvatar ? 'on' : ''}" data-av="${a}" aria-label="Chọn avatar ${a}">${a}</button>`).join('');
+}
+$('#avatarGrid').addEventListener('click', e => {
+  const b = e.target.closest('button[data-av]');
+  if (!b) return;
+  myAvatar = validAv(b.dataset.av) || myAvatar;
+  store.set('tlmn-avatar', myAvatar);
+  renderAvatars();
+  Sfx.blip();
+});
+renderAvatars();
 const inviteCode = new URLSearchParams(location.search).get('room');
 if (inviteCode) {
   // Mở từ link mời: nhập tên rồi vào thẳng phòng

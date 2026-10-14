@@ -9,6 +9,12 @@
   // Link cũ của tool tải ảnh dạng ?folder=... vẫn mở thẳng tool
   if (new URLSearchParams(location.search).has('folder')) location.replace('tools/drive/' + location.search);
 </script>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2b1250">
+<link rel="apple-touch-icon" href="icons/site-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MinhDepTrai">
+<script src="pwa.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&family=Pacifico&display=swap" rel="stylesheet">
@@ -45,6 +51,9 @@
   .chips { display: flex; justify-content: center; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
   .chips a { color: #fff; text-decoration: none; font-weight: 700; font-size: 15px; padding: 9px 16px;
              border-radius: 999px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .25); }
+  .chips .install { font: inherit; font-weight: 700; font-size: 15px; padding: 9px 16px; border-radius: 999px;
+                    cursor: pointer; border: 0; background: #ffd166; color: #2b1250; }
+  [hidden] { display: none !important; }
   @keyframes shine { to { background-position: 300% 0; } }
   @keyframes drift { to { transform: translate(8%, -6%) rotate(20deg); } }
   @media (prefers-reduced-motion: reduce) { .name, .glow { animation: none; } }
@@ -77,6 +86,7 @@
     <nav class="chips">
       <a href="#tools">🧰 Công cụ</a>
       <a href="#games">🎮 Giải trí</a>
+      <button class="install" data-install hidden>📲 Tải app</button>
     </nav>
   </header>
 

@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "Tiến lên miền Nam · Mr.MinhDepTrai",
+  "short_name": "Tiến lên",
+  "description": "Đánh tiến lên miền Nam với máy hoặc với bạn bè",
+  "lang": "vi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d5233",
+  "theme_color": "#0d5233",
+  "icons": [
+    { "src": "../../icons/tienlen-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "../../icons/tienlen-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "../../icons/tienlen-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
