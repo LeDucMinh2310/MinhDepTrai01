@@ -152,10 +152,20 @@
 
   .me { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 10px 10px 12px; transition: box-shadow .2s; }
   .me.turn { box-shadow: 0 0 0 3px var(--accent); }
-  .me-info { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; color: var(--muted); padding: 0 4px; }
+  .me-info { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px;
+             color: var(--muted); padding: 0 4px; }
   .me-info b { color: var(--text); }
+  #meName, #meStatus { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #meStatus { text-align: right; }
+  .mini { flex: none; padding: 6px 12px; border-radius: 999px; background: var(--bg); color: var(--text);
+          border: 1px solid var(--line) !important; font-weight: 700; font-size: 13px; white-space: nowrap; }
   .hand { --cw: clamp(44px, 13.4vw, 66px); display: flex; flex-direction: column; gap: 12px; padding-top: 18px;
-          min-height: calc(var(--cw) * 1.4 + 18px); }
+          min-height: calc(var(--cw) * 1.4 + 18px); touch-action: pan-y; }
+  .hand .card.drag { z-index: 20; transition: none; cursor: grabbing; box-shadow: 0 12px 24px rgba(0, 0, 0, .35); }
+  .hand .card.ins-l::before, .hand .card.ins-r::after { content: ""; position: absolute; top: -6px; bottom: -6px;
+          width: 4px; border-radius: 2px; background: var(--accent); }
+  .hand .card.ins-l::before { left: -5px; }
+  .hand .card.ins-r::after { right: -5px; }
   .row { display: flex; justify-content: center; }
   .empty { margin: auto; color: var(--muted); font-weight: 700; text-align: center; }
   .actions { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 8px; margin-top: 12px; }
@@ -221,6 +231,7 @@
         <li>Chặn bằng bộ <b>cùng loại, cùng số lá</b> nhưng lá cao nhất lớn hơn.</li>
         <li><b>Chặt heo:</b> 3 đôi thông chặt 1 heo · tứ quý chặt heo, đôi heo, 3 đôi thông · 4 đôi thông chặt được cả heo, đôi heo, 3 đôi thông và tứ quý.</li>
         <li>Đã <b>bỏ lượt</b> thì không được đánh tiếp trong vòng đó.</li>
+        <li><b>Xếp bài:</b> bấm nút <b>🧩 Gom bộ</b> trên bài của bạn để đổi cách xếp (gom bộ / theo số / theo chất), hoặc <b>kéo lá bài</b> sang trái, phải để tự xếp.</li>
         <li>Ván đầu: ai giữ lá nhỏ nhất (thường là <b>3♠</b>) đi trước và phải đánh kèm lá đó. Ván sau: người thắng đi trước.</li>
         <li><b>Tới trắng</b> (chơi 4 người): tứ quý heo, sảnh rồng (3 → A), 6 đôi hoặc 5 đôi thông là thắng luôn.</li>
         <li><b>Điểm:</b> 4 người: Nhất +3, Nhì +1, Ba −1, Bét −3 · 2 người: Thắng +2, Thua −2 · Tới trắng: mỗi người thua −3.</li>
@@ -293,7 +304,9 @@
     </div>
     <div class="msg" id="msg" aria-live="polite"></div>
     <div class="me" id="me">
-      <div class="me-info" id="meInfo"></div>
+      <div class="me-info"><span id="meName"></span>
+        <button class="mini" id="sortBtn" title="Đổi cách xếp bài. Có thể kéo lá bài sang trái/phải để tự xếp."></button>
+        <span id="meStatus"></span></div>
       <div class="hand" id="hand"></div>
       <div class="actions">
         <button class="ghost" id="hintBtn">💡 Gợi ý</button>
@@ -1002,7 +1015,7 @@ function onView(nv) {
   if (V.ev && evKey(V) !== evKey(prev)) {
     const ev = V.ev;
     say(describe(ev));
-    if (ev.kind === 'start') { closeDlg('#result'); Sfx.deal(); }
+    if (ev.kind === 'start') { closeDlg('#result'); Sfx.deal(); manualOrder = []; selected.clear(); }
     else if (ev.kind === 'pass') Sfx.pass();
     else if (ev.kind === 'play') {
       if (ev.chopOf) { Sfx.chop(); $('#table').classList.remove('boom'); void $('#table').offsetWidth; $('#table').classList.add('boom'); }
@@ -1057,16 +1070,82 @@ function render() {
   const me = V.players[V.me];
   const st = me.place ? placeText(me.place) : V.passed.includes(V.me) ? 'đã bỏ lượt'
            : myTurn() ? (V.current ? 'tới lượt bạn' : 'bạn đánh tự do') : V.over ? '' : `chờ ${nm(V.turn)}…`;
-  $('#meInfo').innerHTML = `<span>${esc(me.avatar)} <b>${esc(me.name)}</b> · ${V.hand.length} lá</span><span>${esc(st)}</span>`;
+  $('#meName').innerHTML = `${esc(me.avatar)} <b>${esc(me.name)}</b> · ${V.hand.length} lá`;
+  $('#meStatus').textContent = st;
+  $('#sortBtn').textContent = SORT_LABEL[sortMode];
+  $('#sortBtn').hidden = !V.hand.length;
   $('#me').classList.toggle('turn', myTurn());
   $('#playBtn').disabled = $('#hintBtn').disabled = !myTurn();
   $('#passBtn').disabled = !myTurn() || !V.current;
   $('#newBtn').hidden = mode === 'guest';
-  renderHand();
+  if (drag?.on) handDirty = true; // đang kéo bài thì vẽ lại sau khi thả
+  else renderHand();
   renderScore();
 }
 
+// ----- Xếp bài trên tay -----
+// group: gom bộ · rank: theo số · suit: theo chất · manual: tự kéo thả
+const SORT_LABEL = { group: '🧩 Gom bộ', rank: '🔢 Theo số', suit: '♠ Theo chất', manual: '✋ Tự xếp' };
+const SORT_NEXT = { group: 'rank', rank: 'suit', suit: 'group', manual: 'group' };
+let sortMode = store.get('tlmn-sort', 'group');
+if (!SORT_LABEL[sortMode]) sortMode = 'group';
+let manualOrder = [];
+
+// Gom các bộ lại với nhau: rác → đôi → sám → sảnh → đôi thông → tứ quý → heo
+function groupHand(hand) {
+  let rest = [...hand].filter(c => rankOf(c) !== HEO).sort(byId);
+  const heo = hand.filter(c => rankOf(c) === HEO).sort(byId);
+  const B = { quad: [], dseq: [], straight: [], triple: [], pair: [] };
+  const byRank = () => { const by = Array.from({ length: 12 }, () => []); rest.forEach(c => by[rankOf(c)].push(c)); return by; };
+  const take = (kind, cards) => { rest = rest.filter(c => !cards.includes(c)); B[kind].push(cards); };
+  const longestRun = (by, need) => {
+    let best = null;
+    for (let s = 0; s < 12; s++) {
+      let e = s;
+      while (e < 12 && by[e].length >= need) e++;
+      if (e - s >= 3 && (!best || e - s > best[1] - best[0])) best = [s, e];
+    }
+    return best;
+  };
+  byRank().forEach(g => { if (g.length === 4) take('quad', g); });
+  for (let run; (run = longestRun(byRank(), 2));) {
+    const by = byRank(), cards = [];
+    for (let r = run[0]; r < run[1]; r++) cards.push(by[r][0], by[r][1]);
+    take('dseq', cards);
+  }
+  for (let run; (run = longestRun(byRank(), 1));) {
+    const by = byRank(), cards = [];
+    for (let r = run[0]; r < run[1]; r++) cards.push(by[r][0]);
+    take('straight', cards);
+  }
+  byRank().forEach(g => { if (g.length === 3) take('triple', g); });
+  byRank().forEach(g => { if (g.length === 2) take('pair', g); });
+  const groups = [rest, ...B.pair, ...B.triple, ...B.straight, ...B.dseq, ...B.quad, heo].filter(g => g.length);
+  const cards = [], breaks = new Set();
+  groups.forEach(g => { if (cards.length) breaks.add(cards.length); cards.push(...g); });
+  return { cards, breaks };
+}
+
+function arrangeHand(hand) {
+  if (sortMode === 'group') return groupHand(hand);
+  if (sortMode === 'suit') {
+    const cards = [...hand].sort((a, b) => suitOf(a) - suitOf(b) || a - b);
+    return { cards, breaks: new Set(cards.map((c, i) => i && suitOf(c) !== suitOf(cards[i - 1]) ? i : 0).filter(Boolean)) };
+  }
+  if (sortMode === 'manual') {
+    const set = new Set(hand);
+    let order = manualOrder.filter(c => set.has(c));
+    if (!order.length) order = groupHand(hand).cards;
+    else order = order.concat(hand.filter(c => !order.includes(c)).sort(byId));
+    manualOrder = order;
+    return { cards: order, breaks: new Set() };
+  }
+  return { cards: [...hand].sort(byId), breaks: new Set() };
+}
+
+let shownOrder = [];
 function renderHand() {
+  handDirty = false;
   const box = $('#hand'), hand = V.hand;
   [...selected].forEach(c => { if (!hand.includes(c)) selected.delete(c); });
   box.innerHTML = '';
@@ -1075,32 +1154,118 @@ function renderHand() {
     box.innerHTML = `<div class="empty">${me.place ? `🎉 Bạn đã hết bài, ${placeText(me.place)}` : ''}</div>`;
     return;
   }
-  const rows = hand.length > 13 ? 2 : 1, per = Math.ceil(hand.length / rows);
-  for (let r = 0; r < rows; r++) {
+  const { cards, breaks } = arrangeHand(hand);
+  shownOrder = cards;
+  // Nhiều hơn 13 lá thì chia 2 hàng, ưu tiên cắt đúng chỗ giữa hai bộ
+  let cut = cards.length;
+  if (cards.length > 13) {
+    const mid = Math.ceil(cards.length / 2);
+    cut = mid;
+    let bestD = 4;
+    breaks.forEach(b => { const d = Math.abs(b - mid); if (d < bestD) { bestD = d; cut = b; } });
+  }
+  [cards.slice(0, cut), cards.slice(cut)].filter(r => r.length).forEach((part, ri) => {
     const row = document.createElement('div');
     row.className = 'row';
-    hand.slice(r * per, (r + 1) * per).forEach(c => {
+    part.forEach((c, k) => {
       const el = cardEl(c, selected.has(c) ? 'sel' : '');
       el.dataset.c = c;
+      if (k && breaks.has(k + (ri ? cut : 0))) el.classList.add('gs');
       row.appendChild(el);
     });
     box.appendChild(row);
-  }
+  });
   fitHand();
 }
 
-// Xếp chồng lá bài cho vừa chiều ngang màn hình
+// Xếp chồng lá bài cho vừa chiều ngang màn hình, chừa khe giữa các bộ
 function fitHand() {
-  const box = $('#hand'), W = box.clientWidth;
+  const box = $('#hand'), W = box.clientWidth, GAP = 14;
   box.querySelectorAll('.row').forEach(row => {
     const cards = [...row.children], n = cards.length;
     if (!n) return;
     const cw = cards[0].offsetWidth;
-    const step = n > 1 ? Math.min(cw + 4, (W - cw) / (n - 1)) : 0;
-    cards.forEach((el, k) => { el.style.marginLeft = k ? `${step - cw}px` : '0'; });
+    const gaps = cards.filter((el, k) => k && el.classList.contains('gs')).length;
+    const step = n > 1 ? Math.min(cw + 4, (W - cw - gaps * GAP) / (n - 1)) : 0;
+    cards.forEach((el, k) => {
+      el.style.marginLeft = k ? `${step - cw + (el.classList.contains('gs') ? GAP : 0)}px` : '0';
+    });
   });
 }
 addEventListener('resize', fitHand);
+
+$('#sortBtn').addEventListener('click', () => {
+  sortMode = SORT_NEXT[sortMode];
+  store.set('tlmn-sort', sortMode);
+  Sfx.deal();
+  render();
+});
+
+// ----- Kéo thả để tự xếp bài -----
+let drag = null, handDirty = false, eatClick = false;
+function dropTarget(x, y) {
+  let best = null, bestD = Infinity;
+  $('#hand').querySelectorAll('.card').forEach(el => {
+    if (el === drag.el) return;
+    const r = el.getBoundingClientRect();
+    const cx = Math.min(Math.max(x, r.left), r.right), cy = Math.min(Math.max(y, r.top), r.bottom);
+    const d = Math.hypot(x - cx, y - cy) + (x < r.left || x > r.right ? 0 : -1);
+    if (d < bestD) { bestD = d; best = el; }
+  });
+  if (!best) return null;
+  const r = best.getBoundingClientRect();
+  // Lá bài chồng lên nhau nên chỉ thấy phần bên trái: chạm nửa trái phần đang thấy thì chèn trước
+  const next = best.nextElementSibling;
+  const visRight = next && next !== drag.el ? next.getBoundingClientRect().left : r.right;
+  return { el: best, before: x < (r.left + visRight) / 2 };
+}
+function clearMarks() { $('#hand').querySelectorAll('.ins-l, .ins-r').forEach(el => el.classList.remove('ins-l', 'ins-r')); }
+
+$('#hand').addEventListener('pointerdown', e => {
+  const el = e.target.closest('.card');
+  if (!el || e.button > 0) return;
+  drag = { el, id: +el.dataset.c, x0: e.clientX, y0: e.clientY, pid: e.pointerId, on: false, target: null };
+});
+$('#hand').addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.pid) return;
+  const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+  if (!drag.on) {
+    if (Math.abs(dx) < 12 || Math.abs(dx) < Math.abs(dy)) return;
+    drag.on = true;
+    try { drag.el.setPointerCapture(e.pointerId); } catch {}
+    drag.el.classList.add('drag');
+  }
+  e.preventDefault();
+  drag.el.style.transform = `translate(${dx}px, ${dy - (selected.has(drag.id) ? 15 : 0)}px) scale(1.06)`;
+  clearMarks();
+  drag.target = dropTarget(e.clientX, e.clientY);
+  if (drag.target) {
+    const { el, before } = drag.target, next = el.nextElementSibling;
+    if (before) el.classList.add('ins-l');
+    else if (next && next !== drag.el) next.classList.add('ins-l');
+    else el.classList.add('ins-r');
+  }
+});
+function endDrag(e) {
+  if (!drag || e.pointerId !== drag.pid) return;
+  const d = drag;
+  drag = null;
+  if (!d.on) return;
+  clearMarks();
+  eatClick = true;
+  setTimeout(() => { eatClick = false; }, 80);
+  if (e.type === 'pointerup' && d.target) {
+    const order = shownOrder.filter(c => c !== d.id);
+    const at = order.indexOf(+d.target.el.dataset.c) + (d.target.before ? 0 : 1);
+    order.splice(at, 0, d.id);
+    manualOrder = order;
+    if (sortMode !== 'manual') { sortMode = 'manual'; store.set('tlmn-sort', sortMode); render(); }
+    Sfx.card();
+  }
+  renderHand();
+}
+$('#hand').addEventListener('pointerup', endDrag);
+$('#hand').addEventListener('pointercancel', endDrag);
 
 function renderScore() {
   $('#scoreText').textContent = '🏆 ' + V.players.map((p, i) => `${esc(p.avatar)}${signed(V.scores[i])}`).join(' ')
@@ -1270,7 +1435,7 @@ $('#hintBtn').addEventListener('click', () => {
 });
 $('#hand').addEventListener('click', e => {
   const el = e.target.closest('.card');
-  if (!el) return;
+  if (!el || eatClick) return;
   const c = +el.dataset.c;
   selected.has(c) ? selected.delete(c) : selected.add(c);
   el.classList.toggle('sel', selected.has(c));
