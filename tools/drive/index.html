@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mr.MinhDepTrai</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>😎</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f5f7; --card: #fff; --text: #1d1d1f; --muted: #6e6e73;
+    --line: #d2d2d7; --accent: #0a84ff; --accent-text: #fff; --danger: #d70015;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #000; --card: #1c1c1e; --text: #f5f5f7; --muted: #98989d;
+            --line: #38383a; --accent: #0a84ff; --danger: #ff453a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+  header { padding: 16px; max-width: 1000px; margin: 0 auto; }
+  .brand { position: relative; text-align: center; padding: 28px 8px 22px; margin-bottom: 14px;
+           border-radius: 22px; overflow: hidden; isolation: isolate;
+           background: linear-gradient(135deg, #1a1033, #2b1250 45%, #0f2a4a); color: #fff;
+           box-shadow: 0 10px 30px rgba(80, 40, 160, .25);
+           display: block; text-decoration: none; -webkit-tap-highlight-color: transparent;
+           transition: transform .15s; }
+  .brand:active { transform: scale(.98); }
+  .home-link { display: inline-block; margin: 0 0 10px; padding: 7px 14px; border-radius: 999px;
+               background: var(--card); border: 1px solid var(--line); color: var(--accent);
+               font-weight: 600; font-size: 15px; text-decoration: none; }
+  .brand .glow { position: absolute; inset: -40%; z-index: -1; opacity: .55;
+                 background: radial-gradient(circle at 25% 30%, #ff5f9e 0, transparent 35%),
+                             radial-gradient(circle at 75% 70%, #3ad7ff 0, transparent 35%),
+                             radial-gradient(circle at 70% 20%, #ffd166 0, transparent 25%);
+                 filter: blur(30px); animation: drift 12s ease-in-out infinite alternate; }
+  .logo { margin: 0; line-height: 1.1; display: flex; justify-content: center; align-items: baseline;
+          flex-wrap: wrap; gap: 4px; }
+  .logo .mr { font-family: "Pacifico", cursive; font-weight: 400; font-size: clamp(22px, 6vw, 34px);
+              color: #ffd166; transform: rotate(-8deg); display: inline-block;
+              text-shadow: 0 2px 10px rgba(255, 209, 102, .5); }
+  .logo .name { font-family: "Be Vietnam Pro", sans-serif; font-weight: 900; letter-spacing: -1.5px;
+                font-size: clamp(36px, 11vw, 64px);
+                background: linear-gradient(90deg, #ff5f9e, #ffd166, #3ad7ff, #b388ff, #ff5f9e);
+                background-size: 300% 100%; -webkit-background-clip: text; background-clip: text;
+                color: transparent; animation: shine 6s linear infinite;
+                filter: drop-shadow(0 4px 14px rgba(255, 95, 158, .35)); }
+  .tagline { margin: 10px 0 0; font-family: "Be Vietnam Pro", sans-serif; font-weight: 500;
+             font-size: 14px; color: rgba(255, 255, 255, .8); letter-spacing: .2px; }
+  .spark { display: inline-block; animation: twinkle 1.8s ease-in-out infinite; }
+  @keyframes shine { to { background-position: 300% 0; } }
+  @keyframes drift { to { transform: translate(8%, -6%) rotate(20deg); } }
+  @keyframes twinkle { 50% { transform: scale(1.3) rotate(15deg); opacity: .7; } }
+  @media (prefers-reduced-motion: reduce) {
+    .logo .name, .brand .glow, .spark { animation: none; }
+  }
+  form { display: flex; gap: 8px; }
+  input { flex: 1; min-width: 0; padding: 12px; font-size: 16px; border-radius: 10px;
+          border: 1px solid var(--line); background: var(--card); color: var(--text); }
+  button { padding: 12px 16px; font-size: 16px; border: 0; border-radius: 10px;
+           background: var(--accent); color: var(--accent-text); font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .5; }
+  button.ghost { background: transparent; color: var(--accent); padding: 8px 4px; font-weight: 500; }
+  details { margin-top: 10px; color: var(--muted); font-size: 14px; }
+  details input { width: 100%; margin-top: 8px; }
+  .guide { display: block; margin-top: 10px; padding: 12px; border-radius: 10px; text-align: center;
+           background: var(--card); border: 1px solid var(--line); color: var(--accent);
+           font-weight: 600; text-decoration: none; }
+  summary { cursor: pointer; }
+  .help { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+          padding: 10px 14px; color: var(--text); font-size: 14px; }
+  .help summary { color: var(--accent); font-weight: 600; }
+  .help h3 { font-size: 15px; margin: 16px 0 6px; }
+  .help ol { padding-left: 20px; margin: 4px 0; }
+  .help li { margin: 4px 0; }
+  .help p { margin: 6px 0; }
+  .help .tip { color: var(--muted); }
+  .help .linkbtn { display: block; text-align: center; padding: 10px 12px; margin: 8px 0 4px;
+                   border-radius: 10px; background: var(--accent); color: var(--accent-text);
+                   font-weight: 600; text-decoration: none; }
+  .help a { color: var(--accent); }
+  .help code { background: var(--bg); padding: 1px 4px; border-radius: 4px; font-size: 13px; word-break: break-all; }
+  #status { color: var(--muted); font-size: 14px; min-height: 20px; margin: 10px 0 0; }
+  #status.error { color: var(--danger); }
+  #toolbar { display: flex; justify-content: space-between; align-items: center;
+             padding: 0 16px; max-width: 1000px; margin: 0 auto; color: var(--muted); font-size: 14px; }
+  #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+          gap: 4px; padding: 8px 16px; max-width: 1000px; margin: 0 auto; }
+  .item { position: relative; aspect-ratio: 1; background: var(--card); border-radius: 6px;
+          overflow: hidden; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .15s; }
+  .item.sel img { transform: scale(.88); border-radius: 6px; }
+  .check { position: absolute; top: 6px; left: 6px; width: 24px; height: 24px; border-radius: 50%;
+           border: 2px solid #fff; background: rgba(0,0,0,.25); box-shadow: 0 0 3px rgba(0,0,0,.4);
+           display: grid; place-items: center; color: #fff; font-size: 14px; font-weight: 700; }
+  .item.sel .check { background: var(--accent); }
+  .item.sel .check::after { content: "✓"; }
+  .zoom { position: absolute; bottom: 4px; right: 4px; width: 36px; height: 36px; padding: 0;
+          border-radius: 50%; background: rgba(0,0,0,.5); color: #fff; font-size: 17px; font-weight: 400;
+          box-shadow: 0 0 0 2px rgba(255,255,255,.7); }
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+         background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(12px);
+         border-top: 1px solid var(--line); display: flex; justify-content: center; }
+  #bar button { width: 100%; max-width: 500px; }
+  dialog { border: 0; border-radius: 14px; background: var(--card); color: var(--text);
+           padding: 20px; width: min(420px, calc(100% - 32px)); }
+  dialog::backdrop { background: rgba(0,0,0,.6); }
+  dialog .actions { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  #viewer { padding: 0; margin: 0; width: 100vw; height: 100vh; height: 100dvh; max-width: none; max-height: none;
+            border-radius: 0; background: #000; color: #fff; overflow: hidden; }
+  #viewer[open] { display: flex; flex-direction: column; }
+  #viewer::backdrop { background: #000; }
+  .v-top { display: flex; align-items: center; gap: 12px; padding: calc(8px + env(safe-area-inset-top)) 12px 8px 16px; }
+  #vCount { flex: 1; min-width: 0; font-size: 15px; opacity: .85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .v-close { flex: none; width: 46px; height: 46px; padding: 0; border-radius: 50%;
+             background: rgba(255,255,255,.18); font-size: 22px; font-weight: 400; }
+  .v-stage { flex: 1; min-height: 0; position: relative; overflow: hidden; touch-action: none;
+             display: flex; align-items: center; justify-content: center; }
+  #vImg { max-width: 100%; max-height: 100%; object-fit: contain; user-select: none; -webkit-user-select: none;
+          -webkit-user-drag: none; will-change: transform; }
+  .v-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 64px; padding: 0;
+           background: rgba(255,255,255,.15); font-size: 34px; font-weight: 300; line-height: 1; }
+  .v-prev { left: 6px; } .v-next { right: 6px; }
+  .v-bottom { padding: 10px 16px calc(14px + env(safe-area-inset-bottom)); text-align: center; }
+  .v-hint { font-size: 13px; opacity: .6; margin: 0 0 10px; }
+  #vSelect { width: 100%; max-width: 420px; font-size: 18px; padding: 14px; background: transparent;
+             color: #fff; box-shadow: inset 0 0 0 2px rgba(255,255,255,.7); }
+  #vSelect.on { background: var(--accent); box-shadow: none; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <a class="home-link" href="../../">← Trang chủ</a>
+  <a class="brand" href="./" aria-label="Mr.MinhDepTrai: về trang chính">
+    <div class="glow" aria-hidden="true"></div>
+    <h1 class="logo"><span class="mr">Mr.</span><span class="name">MinhDepTrai</span></h1>
+    <p class="tagline">Tải ảnh từ Google Drive về điện thoại <span class="spark">✨</span></p>
+  </a>
+  <form id="form">
+    <input id="link" type="text" inputmode="url" autocomplete="off"
+           placeholder="Dán link thư mục Google Drive…" required>
+    <button id="go">Xem</button>
+  </form>
+  <a class="guide" href="huong-dan.html">📖 Hướng dẫn có hình ảnh từng bước</a>
+  <details id="keyBox">
+    <summary>Google API key</summary>
+    <input id="key" type="text" autocomplete="off" placeholder="AIza…">
+  </details>
+  <details class="help">
+    <summary>📖 Hướng dẫn</summary>
+
+    <div id="keyHelp">
+      <h3>Lấy API key (làm 1 lần)</h3>
+      <a class="linkbtn" href="huong-dan.html#p3">📖 Xem hướng dẫn có hình</a>
+      <a class="linkbtn" href="https://console.cloud.google.com/flows/enableapi?apiid=drive.googleapis.com&amp;hl=en" target="_blank" rel="noopener">① Bật Google Drive API ↗</a>
+      <p class="tip">Chọn project bất kỳ → <b>Next</b> → <b>Enable</b>.</p>
+      <a class="linkbtn" href="https://console.cloud.google.com/apis/credentials?hl=en" target="_blank" rel="noopener">② Tạo API key ↗</a>
+      <p class="tip"><b>+ Create credentials</b> → <b>API key</b> → copy key (dạng <code>AIza…</code>) → dán vào ô <b>Google API key</b> ở trên.</p>
+    </div>
+
+    <h3>Chia sẻ thư mục ảnh</h3>
+    <a class="linkbtn" href="https://drive.google.com/drive/my-drive?hl=en" target="_blank" rel="noopener">Mở Google Drive ↗</a>
+    <ol>
+      <li>Chuột phải vào thư mục (điện thoại: bấm <b>⋮</b>) → <b>Share</b>.</li>
+      <li>Mục <b>General access</b>: đổi <i>Restricted</i> thành <b>Anyone with the link</b>.</li>
+      <li>Bấm <b>Copy link</b> → dán vào ô ở trên → <b>Xem</b>.</li>
+    </ol>
+    <p class="tip">💡 Ảnh trong thư mục con sẽ không hiện, hãy dán link của đúng thư mục chứa ảnh.</p>
+  </details>
+  <p id="status"></p>
+</header>
+
+<div id="toolbar" hidden>
+  <span id="count"></span>
+  <button class="ghost" id="selAll">Chọn tất cả</button>
+</div>
+<main id="grid"></main>
+
+<div id="bar" hidden><button id="dl" disabled>Tải về</button></div>
+
+<dialog id="ready">
+  <strong id="readyText"></strong>
+  <div class="actions">
+    <button id="share">Lưu vào điện thoại</button>
+    <button class="ghost" id="saveFiles">Tải dạng file</button>
+    <button class="ghost" id="closeReady">Đóng</button>
+  </div>
+</dialog>
+
+<dialog id="viewer">
+  <div class="v-top">
+    <span id="vCount"></span>
+    <button class="v-close" id="vClose" aria-label="Đóng">✕</button>
+  </div>
+  <div class="v-stage" id="vStage">
+    <img id="vImg" alt="" referrerpolicy="no-referrer" draggable="false">
+    <button class="v-nav v-prev" id="vPrev" aria-label="Ảnh trước">‹</button>
+    <button class="v-nav v-next" id="vNext" aria-label="Ảnh sau">›</button>
+  </div>
+  <div class="v-bottom">
+    <p class="v-hint">Vuốt ngang để xem ảnh khác · Chạm 2 lần hoặc dùng 2 ngón để phóng to</p>
+    <button id="vSelect"></button>
+  </div>
+</dialog>
+
+<script>
+// Dán API key vào đây nếu không muốn nhập trên giao diện
+const API_KEY = '';
+
+const $ = s => document.querySelector(s);
+const API = 'https://www.googleapis.com/drive/v3/files';
+let files = [];
+let selected = new Set();
+let prepared = [];
+
+const store = {
+  get(k) { try { return localStorage.getItem(k) || ''; } catch { return ''; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+};
+
+if (API_KEY) $('#keyBox').hidden = $('#keyHelp').hidden = true;
+$('#key').value = store.get('driveKey');
+$('#link').value = new URLSearchParams(location.search).get('folder') || store.get('driveLink');
+if (!API_KEY && !$('#key').value) $('#keyBox').open = true;
+
+const getKey = () => API_KEY || $('#key').value.trim();
+
+function setStatus(msg, isError = false) {
+  $('#status').textContent = msg;
+  $('#status').classList.toggle('error', isError);
+}
+
+function parseFolderId(s) {
+  s = s.trim();
+  const m = s.match(/\/folders\/([\w-]+)/) || s.match(/[?&]id=([\w-]+)/);
+  if (m) return m[1];
+  return /^[\w-]{10,}$/.test(s) ? s : null;
+}
+
+async function listImages(folderId, key) {
+  const out = [];
+  let pageToken = '';
+  do {
+    const p = new URLSearchParams({
+      q: `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`,
+      fields: 'nextPageToken, files(id, name, mimeType)',
+      orderBy: 'name', pageSize: '1000', key,
+      supportsAllDrives: 'true', includeItemsFromAllDrives: 'true'
+    });
+    if (pageToken) p.set('pageToken', pageToken);
+    const r = await fetch(`${API}?${p}`);
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error?.message || r.statusText);
+    out.push(...j.files);
+    pageToken = j.nextPageToken;
+  } while (pageToken);
+  return out;
+}
+
+const thumb = (id, w) => `https://drive.google.com/thumbnail?id=${id}&sz=w${w}`;
+
+function render() {
+  const grid = $('#grid');
+  grid.innerHTML = '';
+  for (const f of files) {
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.dataset.id = f.id;
+    el.innerHTML = `<img loading="lazy" referrerpolicy="no-referrer" alt=""><span class="check"></span>
+                    <button class="zoom" aria-label="Xem ảnh to">🔍</button>`;
+    el.querySelector('img').src = thumb(f.id, 400);
+    el.querySelector('img').alt = f.name;
+    el.addEventListener('click', e => {
+      if (e.target.closest('.zoom')) return openViewer(files.indexOf(f));
+      toggleSelect(f.id);
+    });
+    grid.appendChild(el);
+  }
+  $('#toolbar').hidden = $('#bar').hidden = files.length === 0;
+  updateBar();
+}
+
+function updateBar() {
+  const n = selected.size;
+  $('#count').textContent = `${files.length} ảnh · đã chọn ${n}`;
+  $('#dl').textContent = n ? `Tải về (${n})` : 'Chạm vào ảnh để chọn';
+  $('#dl').disabled = n === 0;
+  $('#selAll').textContent = n === files.length && n > 0 ? 'Bỏ chọn' : 'Chọn tất cả';
+}
+
+function toggleSelect(id) {
+  selected.has(id) ? selected.delete(id) : selected.add(id);
+  $(`.item[data-id="${id}"]`)?.classList.toggle('sel', selected.has(id));
+  updateBar();
+  updateViewerSelect();
+}
+
+// ===== Trình xem ảnh: vuốt để chuyển ảnh, chạm 2 lần / 2 ngón để phóng to =====
+const vImg = $('#vImg'), vStage = $('#vStage');
+const V = { i: 0, s: 1, x: 0, y: 0, pts: new Map(), start: null, pinch: null, lastTap: 0 };
+
+function applyT(animate) {
+  vImg.style.transition = animate ? 'transform .2s ease-out' : 'none';
+  vImg.style.transform = `translate(${V.x}px, ${V.y}px) scale(${V.s})`;
+}
+function resetT(animate = true) { V.s = 1; V.x = 0; V.y = 0; applyT(animate); }
+
+function show(i) {
+  V.i = (i + files.length) % files.length;
+  const f = files[V.i];
+  vImg.src = thumb(f.id, 400); // bản nhỏ đã có sẵn nên hiện ngay
+  const hi = new Image();
+  hi.referrerPolicy = 'no-referrer';
+  hi.onload = () => { if (files[V.i] === f) vImg.src = hi.src; };
+  hi.src = thumb(f.id, 2000);
+  $('#vCount').textContent = `${V.i + 1} / ${files.length} · ${f.name}`;
+  $('#vPrev').hidden = $('#vNext').hidden = files.length < 2;
+  resetT(false);
+  updateViewerSelect();
+}
+
+function updateViewerSelect() {
+  const f = files[V.i];
+  if (!f) return;
+  const on = selected.has(f.id);
+  $('#vSelect').textContent = on ? '✓ Đã chọn ảnh này' : '○ Chọn ảnh này';
+  $('#vSelect').classList.toggle('on', on);
+}
+
+function openViewer(i) {
+  show(i);
+  $('#viewer').showModal();
+}
+
+function zoomAt(clientX, clientY) {
+  if (V.s > 1) return resetT();
+  const r = vStage.getBoundingClientRect();
+  const px = clientX - (r.left + r.width / 2), py = clientY - (r.top + r.height / 2);
+  V.s = 2.5; V.x = -px * (V.s - 1); V.y = -py * (V.s - 1);
+  applyT(true);
+}
+
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+vStage.addEventListener('pointerdown', e => {
+  if (e.target.closest('.v-nav')) return;
+  vStage.setPointerCapture(e.pointerId);
+  V.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (V.pts.size === 1) V.start = { x: e.clientX, y: e.clientY, tx: V.x, ty: V.y };
+  if (V.pts.size === 2) {
+    const [a, b] = [...V.pts.values()];
+    V.pinch = { d: dist(a, b), s: V.s };
+  }
+});
+
+vStage.addEventListener('pointermove', e => {
+  if (!V.pts.has(e.pointerId)) return;
+  V.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (V.pinch && V.pts.size === 2) {
+    const [a, b] = [...V.pts.values()];
+    V.s = Math.min(5, Math.max(1, V.pinch.s * dist(a, b) / V.pinch.d));
+    applyT();
+  } else if (V.start && !V.pinch) {
+    const dx = e.clientX - V.start.x, dy = e.clientY - V.start.y;
+    if (V.s > 1) { V.x = V.start.tx + dx; V.y = V.start.ty + dy; } // kéo ảnh khi đang phóng to
+    else { V.x = dx; V.y = 0; }                                   // ảnh chạy theo ngón tay khi vuốt
+    applyT();
+  }
+});
+
+function pointerEnd(e) {
+  if (!V.pts.has(e.pointerId)) return;
+  V.pts.delete(e.pointerId);
+  if (V.pinch) {
+    if (V.pts.size < 2) { V.pinch = null; V.start = null; if (V.s < 1.05) resetT(); }
+    return;
+  }
+  if (!V.start) return;
+  const dx = e.clientX - V.start.x, dy = e.clientY - V.start.y;
+  V.start = null;
+  if (V.s === 1 && files.length > 1 && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+    return show(V.i + (dx < 0 ? 1 : -1));
+  }
+  if (V.s === 1) resetT();
+  if (Math.hypot(dx, dy) < 10) {
+    const now = Date.now();
+    if (now - V.lastTap < 300) { zoomAt(e.clientX, e.clientY); V.lastTap = 0; }
+    else V.lastTap = now;
+  }
+}
+vStage.addEventListener('pointerup', pointerEnd);
+vStage.addEventListener('pointercancel', pointerEnd);
+
+vStage.addEventListener('wheel', e => {
+  e.preventDefault();
+  V.s = Math.min(5, Math.max(1, V.s * (e.deltaY < 0 ? 1.15 : 1 / 1.15)));
+  if (V.s === 1) { V.x = 0; V.y = 0; }
+  applyT();
+}, { passive: false });
+
+$('#vPrev').addEventListener('click', () => show(V.i - 1));
+$('#vNext').addEventListener('click', () => show(V.i + 1));
+$('#vClose').addEventListener('click', () => $('#viewer').close());
+$('#vSelect').addEventListener('click', () => toggleSelect(files[V.i].id));
+$('#viewer').addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft') show(V.i - 1);
+  if (e.key === 'ArrowRight') show(V.i + 1);
+});
+
+$('#selAll').addEventListener('click', () => {
+  selected = selected.size === files.length ? new Set() : new Set(files.map(f => f.id));
+  document.querySelectorAll('.item').forEach(el => el.classList.toggle('sel', selected.has(el.dataset.id)));
+  updateBar();
+});
+
+$('#form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const key = getKey();
+  const folderId = parseFolderId($('#link').value);
+  if (!key) { $('#keyBox').open = true; return setStatus('Cần nhập Google API key.', true); }
+  if (!folderId) return setStatus('Link thư mục không hợp lệ.', true);
+  store.set('driveKey', $('#key').value.trim());
+  store.set('driveLink', $('#link').value.trim());
+
+  $('#go').disabled = true;
+  setStatus('Đang tải danh sách ảnh…');
+  try {
+    files = await listImages(folderId, key);
+    selected = new Set();
+    render();
+    setStatus(files.length ? '' :
+      'Không thấy ảnh nào. Kiểm tra thư mục đã chia sẻ "Bất kỳ ai có đường liên kết" chưa.', !files.length);
+  } catch (err) {
+    setStatus('Lỗi: ' + err.message, true);
+  } finally {
+    $('#go').disabled = false;
+  }
+});
+
+async function fetchFile(f, key) {
+  const r = await fetch(`${API}/${f.id}?alt=media&supportsAllDrives=true&key=${encodeURIComponent(key)}`);
+  if (!r.ok) throw new Error(`${f.name}: ${r.status}`);
+  return new File([await r.blob()], f.name, { type: f.mimeType });
+}
+
+// Tải song song tối đa 4 ảnh một lúc
+async function fetchAll(list, key, onProgress) {
+  const out = new Array(list.length);
+  let next = 0, done = 0;
+  const worker = async () => {
+    while (next < list.length) {
+      const i = next++;
+      out[i] = await fetchFile(list[i], key);
+      onProgress(++done);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(4, list.length) }, worker));
+  return out;
+}
+
+$('#dl').addEventListener('click', async () => {
+  const list = files.filter(f => selected.has(f.id));
+  const btn = $('#dl');
+  btn.disabled = true;
+  try {
+    prepared = await fetchAll(list, getKey(), n => btn.textContent = `Đang tải ${n}/${list.length}…`);
+    // Trình duyệt chỉ cho mở menu chia sẻ ngay sau một lần chạm, nên hỏi lại người dùng
+    const canShare = navigator.canShare?.({ files: prepared });
+    // iPhone lưu vào Ảnh qua menu chia sẻ; Android/máy tính thì tải file thẳng vào máy
+    const preferShare = canShare && !/Android/i.test(navigator.userAgent);
+    $('#share').hidden = !canShare;
+    $('#share').textContent = preferShare ? 'Lưu vào điện thoại' : 'Chia sẻ…';
+    $('#share').className = preferShare ? '' : 'ghost';
+    $('#saveFiles').textContent = preferShare ? 'Tải dạng file' : 'Lưu vào điện thoại';
+    $('#saveFiles').className = preferShare ? 'ghost' : '';
+    $('#saveFiles').style.order = preferShare ? '' : '-1';
+    $('#readyText').textContent = `Đã sẵn sàng ${prepared.length} ảnh.`;
+    $('#ready').showModal();
+  } catch (err) {
+    setStatus('Lỗi khi tải: ' + err.message, true);
+  } finally {
+    updateBar();
+  }
+});
+
+$('#share').addEventListener('click', async () => {
+  try {
+    await navigator.share({ files: prepared });
+    $('#ready').close();
+  } catch (err) {
+    if (err.name !== 'AbortError') setStatus('Không chia sẻ được: ' + err.message, true);
+  }
+});
+
+$('#saveFiles').addEventListener('click', async () => {
+  for (const file of prepared) {
+    const url = URL.createObjectURL(file);
+    const a = Object.assign(document.createElement('a'), { href: url, download: file.name });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    await new Promise(r => setTimeout(r, 400));
+  }
+  $('#ready').close();
+});
+
+$('#closeReady').addEventListener('click', () => $('#ready').close());
+</script>
+</body>
+</html>
