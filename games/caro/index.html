@@ -10,6 +10,8 @@
 <link rel="apple-touch-icon" href="../../icons/site-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <script src="../../pwa.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="../net2p.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
@@ -100,6 +102,19 @@
   .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .actions button { padding: 13px; border-radius: 14px; font-weight: 800; }
   .ghost { background: var(--card); color: var(--text); border: 2px solid var(--line) !important; }
+  .field { width: 100%; padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line); background: var(--bg);
+           color: var(--text); font: inherit; font-size: 17px; }
+  .field:focus { outline: none; border-color: var(--accent); }
+  .joinrow { display: flex; gap: 8px; }
+  .joinrow .field { text-transform: uppercase; letter-spacing: 3px; font-weight: 800; }
+  .joinrow button { flex: none; padding: 0 20px; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 800; }
+  .note.err { color: var(--danger); font-weight: 700; }
+  .note.ok { color: var(--good); font-weight: 700; }
+  .code { font-size: 40px; letter-spacing: 8px; font-weight: 900; color: var(--accent); }
+  .invite { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .invite button { padding: 12px; border-radius: 14px; font-weight: 800; }
+  .link { margin-top: 10px; font-size: 13px; color: var(--muted); word-break: break-all; user-select: all; }
+  .seg button small { white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -122,6 +137,17 @@
       <div class="seg" id="segMode">
         <button data-v="ai">🤖 Với máy<small>Một mình</small></button>
         <button data-v="pvp">👥 2 người<small>Chung một máy</small></button>
+        <button data-v="online">🌐 Online<small>Mời bạn qua link</small></button>
+      </div>
+      <div id="onlineBox">
+        <h3>Tên của bạn</h3>
+        <input class="field" id="nameInput" maxlength="16" autocomplete="nickname" placeholder="Ví dụ: Minh">
+        <h3 id="joinTitle">Vào phòng của bạn bè</h3>
+        <div class="joinrow">
+          <input class="field" id="codeInput" maxlength="5" autocomplete="off" placeholder="MÃ PHÒNG">
+          <button id="joinBtn">Vào</button>
+        </div>
+        <p class="note" id="netMsg"></p>
       </div>
       <div id="aiBox">
         <h3>Độ khó</h3>
@@ -147,6 +173,22 @@
         <span><b>Chặn 2 đầu</b><small>5 con mà bị đối thủ chặn cả 2 đầu thì không tính thắng (luật caro Việt Nam).</small></span></label>
     </div>
     <button class="primary" id="startBtn">Bắt đầu chơi</button>
+  </section>
+
+  <!-- Chờ bạn vào phòng (chủ phòng) -->
+  <section class="setup" id="roomWait" hidden>
+    <div class="panel" style="text-align:center">
+      <small class="note" style="margin:0">Mã phòng</small>
+      <div class="code" id="roomCode">-----</div>
+      <div class="invite">
+        <button class="ghost" id="shareBtn">📤 Mời bạn</button>
+        <button class="ghost" id="copyBtn">📋 Copy link</button>
+      </div>
+      <div class="link" id="inviteLink"></div>
+      <p class="note" id="waitMsg">Đang tạo phòng…</p>
+    </div>
+    <p class="note" style="text-align:center">⏳ Bạn bè bấm link hoặc nhập mã là ván tự bắt đầu.</p>
+    <button class="pill" id="cancelRoomBtn" style="align-self:center">✕ Huỷ phòng</button>
   </section>
 
   <!-- Bàn cờ -->
@@ -209,6 +251,8 @@ function renderSetup() {
   const mark = (id, v) => document.querySelectorAll(`#${id} button`).forEach(b => b.classList.toggle('on', b.dataset.v === String(v)));
   mark('segMode', S.mode); mark('segLevel', S.level); mark('segSide', S.side); mark('segSize', S.size);
   $('#aiBox').hidden = S.mode !== 'ai';
+  $('#onlineBox').hidden = S.mode !== 'online';
+  $('#startBtn').textContent = S.mode === 'online' ? '➕ Tạo phòng mới' : 'Bắt đầu chơi';
   $('#blockBox').hidden = S.size === 3;
   $('#optBlock').checked = S.block;
   $('#sizeNote').textContent = S.size === 0 ? 'Bàn bắt đầu 15 × 15, đánh gần tới mép thì tự nới rộng thêm, không bao giờ hết chỗ.'
@@ -346,8 +390,10 @@ function newGame() {
   G.stones = new Map(); G.moves = []; G.turn = 'X'; G.over = false; G.win = null; G.scored = null;
   G.b = G.size ? { minX: 0, maxX: G.size - 1, minY: 0, maxY: G.size - 1 } : { minX: -7, maxX: 7, minY: -7, maxY: 7 };
   zoom = 1;
+  if (NET.role === 'host') { NET.games++; NET.mySide = NET.games % 2 ? 'X' : 'O'; } // mỗi ván đổi người đi trước
   render({ center: true });
   scheduleAi();
+  publish();
 }
 
 function place(x, y) {
@@ -364,6 +410,7 @@ function place(x, y) {
   render({ grow, focus: [x, y] });
   if (G.over) finish();
   else scheduleAi();
+  publish();
 }
 
 // Bàn tự mở rộng: còn ít hơn 3 ô tới mép thì nới thêm về phía đó
@@ -412,8 +459,14 @@ function undo() {
 // ================= Điểm =================
 const scoreKey = () => `caro-score-${S.mode}`;
 function finish() {
-  const sc = store.get(scoreKey(), { X: 0, O: 0, draw: 0 });
   const w = G.win.p;
+  if (S.mode === 'online') {
+    if (NET.role === 'host') NET.score[!w ? 'draw' : w === NET.mySide ? 'host' : 'guest']++;
+    renderStatus();
+    !w ? Sfx.draw() : w === NET.mySide ? Sfx.win() : Sfx.lose();
+    return;
+  }
+  const sc = store.get(scoreKey(), { X: 0, O: 0, draw: 0 });
   G.scored = w || 'draw';
   sc[G.scored]++;
   store.set(scoreKey(), sc);
@@ -426,7 +479,9 @@ function finish() {
 // ================= Vẽ =================
 const wrapEl = $('#boardWrap'), boardEl = $('#board');
 let zoom = 1, cs = 32;
-const who = p => S.mode === 'ai' ? (p === S.side ? 'Bạn' : 'Máy') : `Người ${p}`;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const who = p => S.mode === 'ai' ? (p === S.side ? 'Bạn' : 'Máy')
+  : S.mode === 'online' ? (p === NET.mySide ? 'Bạn' : esc(NET.oppName)) : `Người ${p}`;
 const mk = p => `<span class="mk ${p}">${p === 'X' ? '✕' : '◯'}</span>`;
 
 function renderStatus() {
@@ -435,16 +490,27 @@ function renderStatus() {
   let t;
   if (G.over) {
     const w = G.win.p;
-    t = !w ? '🤝 Hoà rồi!' : S.mode === 'ai' ? (w === S.side ? `🎉 Bạn thắng! ${mk(w)}` : `😢 Máy thắng ${mk(w)}`) : `🎉 ${mk(w)} thắng!`;
+    const mine = S.mode === 'ai' ? S.side : S.mode === 'online' ? NET.mySide : null;
+    t = !w ? '🤝 Hoà rồi!' : !mine ? `🎉 ${mk(w)} thắng!`
+      : w === mine ? `🎉 Bạn thắng! ${mk(w)}` : `😢 ${who(w)} thắng ${mk(w)}`;
   } else {
     t = `Lượt: ${mk(G.turn)} ${who(G.turn)}${isAiTurn() ? ' đang nghĩ…' : ''}`;
   }
+  if (S.mode === 'online' && !NET.oppOnline) t += ' · <span style="color:var(--danger)">📴 đối thủ mất kết nối</span>';
   $('#turnText').innerHTML = t;
-  const sc = store.get(scoreKey(), { X: 0, O: 0, draw: 0 });
-  $('#scoreText').innerHTML = S.mode === 'ai'
-    ? `Bạn ${sc[S.side]} – ${sc[other(S.side)]} Máy`
-    : `${mk('X')} ${sc.X} – ${sc.O} ${mk('O')}`;
+  if (S.mode === 'online') {
+    const host = NET.role === 'host', sc = NET.score;
+    $('#scoreText').innerHTML = `Bạn ${host ? sc.host : sc.guest} – ${host ? sc.guest : sc.host} ${esc(NET.oppName)}`;
+  } else {
+    const sc = store.get(scoreKey(), { X: 0, O: 0, draw: 0 });
+    $('#scoreText').innerHTML = S.mode === 'ai'
+      ? `Bạn ${sc[S.side]} – ${sc[other(S.side)]} Máy`
+      : `${mk('X')} ${sc.X} – ${sc.O} ${mk('O')}`;
+  }
+  $('#undoBtn').hidden = S.mode === 'online';
   $('#undoBtn').disabled = !G.moves.length || (S.mode === 'ai' && !G.moves.some(m => m[2] === S.side));
+  $('#newBtn').disabled = S.mode === 'online' && NET.role === 'guest' && !G.over;
+  $('#setupBtn').textContent = S.mode === 'online' ? '⏏︎ Rời phòng' : '⚙️ Chế độ';
 }
 
 function cellSize() {
@@ -514,7 +580,12 @@ function ensureVisible(x, y) {
 boardEl.addEventListener('click', e => {
   const el = e.target.closest('.c');
   if (!el || G.over || isAiTurn()) return;
-  place(+el.dataset.x, +el.dataset.y);
+  const x = +el.dataset.x, y = +el.dataset.y;
+  if (S.mode === 'online') {
+    if (G.turn !== NET.mySide || get(x, y)) return;
+    if (NET.role === 'guest') { NET.link?.send({ t: 'move', x, y }); return; } // chủ phòng kiểm tra rồi gửi lại
+  }
+  place(x, y);
 });
 
 function setZoom(z) {
@@ -531,25 +602,173 @@ $('#focusBtn').addEventListener('click', () => {
 });
 addEventListener('resize', () => { if (!$('#game').hidden) render(); });
 
+// ================= Chơi online (chủ phòng giữ ván, khách gửi nước đi) =================
+const PREFIX = 'mrminhdeptrai-caro-';
+const NET = { role: null, link: null, code: '', myName: '', oppName: '', oppOnline: true, mySide: 'X',
+              score: { host: 0, guest: 0, draw: 0 }, games: 0, gameNo: 0, started: false };
+
+function show(name) {
+  $('#setup').hidden = name !== 'setup';
+  $('#roomWait').hidden = name !== 'roomWait';
+  $('#game').hidden = name !== 'game';
+  document.body.classList.toggle('playing', name === 'game');
+  if (name === 'setup') renderSetup();
+}
+function netMsg(text, cls = '') { $('#netMsg').textContent = text; $('#netMsg').className = 'note' + (cls ? ' ' + cls : ''); }
+function waitMsg(text, cls = '') { $('#waitMsg').textContent = text; $('#waitMsg').className = 'note' + (cls ? ' ' + cls : ''); }
+const inviteUrl = () => `${location.origin}${location.pathname}?room=${NET.code}`;
+
+function readName() {
+  const name = String($('#nameInput').value || '').replace(/\s+/g, ' ').trim().slice(0, 16);
+  if (!name) { netMsg('Nhập tên của bạn trước đã nhé.', 'err'); $('#nameInput').focus(); return null; }
+  store.set('caro-name', name);
+  return name;
+}
+
+function leaveRoom() {
+  NET.link?.close();
+  Object.assign(NET, { role: null, link: null, code: '', oppName: '', oppOnline: true, started: false, games: 0, gameNo: 0,
+                       score: { host: 0, guest: 0, draw: 0 } });
+  G.token++;
+}
+
+function publish() {
+  if (NET.role !== 'host' || !NET.link) return;
+  NET.link.send({ t: 'state', gameNo: NET.games, size: G.size, block: G.block, moves: G.moves, turn: G.turn,
+                  over: G.over, win: G.win, hostSide: NET.mySide, hostName: NET.myName, score: NET.score });
+}
+
+function createRoom() {
+  if (!Net2P.available()) return netMsg('Không tải được phần kết nối. Kiểm tra mạng rồi tải lại trang.', 'err');
+  const name = readName();
+  if (!name) return;
+  leaveRoom();
+  store.set('caro-setup', S);
+  Object.assign(NET, { role: 'host', myName: name, oppOnline: false });
+  $('#roomCode').textContent = '-----';
+  $('#inviteLink').textContent = '';
+  waitMsg('Đang tạo phòng…');
+  show('roomWait');
+  NET.link = Net2P.host(PREFIX, {
+    onReady: code => {
+      NET.code = code;
+      $('#roomCode').textContent = code;
+      $('#inviteLink').textContent = inviteUrl();
+      waitMsg('Phòng đã sẵn sàng, gửi link mời bạn nhé!', 'ok');
+    },
+    onJoin: info => {
+      NET.oppName = info.name; NET.oppOnline = true;
+      Sfx.put('O');
+      if (!NET.started) { NET.started = true; show('game'); newGame(); }
+      else { renderStatus(); publish(); }
+    },
+    onLeave: () => { NET.oppOnline = false; renderStatus(); },
+    onData: d => {
+      if (d.t === 'move') {
+        const x = Math.trunc(+d.x), y = Math.trunc(+d.y);
+        if (Number.isFinite(x) && Number.isFinite(y) && !G.over && G.turn === other(NET.mySide)) place(x, y);
+      } else if (d.t === 'again' && G.over) newGame();
+    },
+    onError: msg => waitMsg(msg + ' Thử tạo phòng lại nhé.', 'err')
+  });
+}
+
+function joinRoom() {
+  if (!Net2P.available()) return netMsg('Không tải được phần kết nối. Kiểm tra mạng rồi tải lại trang.', 'err');
+  const code = Net2P.cleanCode($('#codeInput').value);
+  if (code.length !== 5) return netMsg('Mã phòng gồm 5 ký tự, kiểm tra lại nhé.', 'err');
+  const name = readName();
+  if (!name) return;
+  leaveRoom();
+  Object.assign(NET, { role: 'guest', myName: name });
+  netMsg(`Đang vào phòng ${code}…`);
+  NET.link = Net2P.join(PREFIX, code, name, {
+    onOpen: () => netMsg('Đã vào phòng, chờ chủ phòng…', 'ok'),
+    onData: d => { if (d.t === 'state') applyState(d); },
+    onFail: msg => { leaveRoom(); show('setup'); netMsg(msg, 'err'); }
+  });
+}
+
+// Khách: dựng lại bàn từ danh sách nước đi chủ phòng gửi sang
+function applyState(st) {
+  if ($('#game').hidden) show('game');
+  NET.mySide = other(st.hostSide); NET.oppName = String(st.hostName || 'Chủ phòng').slice(0, 16);
+  NET.score = st.score; NET.oppOnline = true;
+  const fresh = st.gameNo !== NET.gameNo || st.moves.length < G.moves.length;
+  const wasOver = G.over;
+  if (fresh) {
+    NET.gameNo = st.gameNo;
+    S.size = st.size; S.block = st.block;
+    G.size = st.size; G.need = st.size === 3 ? 3 : 5; G.block = st.block;
+    G.stones = new Map(); G.moves = [];
+    G.b = G.size ? { minX: 0, maxX: G.size - 1, minY: 0, maxY: G.size - 1 } : { minX: -7, maxX: 7, minY: -7, maxY: 7 };
+    zoom = 1;
+  }
+  const grow = { left: 0, top: 0 };
+  for (let i = G.moves.length; i < st.moves.length; i++) {
+    const [x, y, p] = st.moves[i];
+    G.stones.set(key(x, y), p);
+    G.moves.push([x, y, p]);
+    const g = expand(x, y);
+    grow.left += g.left; grow.top += g.top;
+  }
+  const added = !fresh && G.moves.length && st.moves.length > 0;
+  G.turn = st.turn; G.over = st.over; G.win = st.win;
+  const last = G.moves[G.moves.length - 1];
+  render(fresh ? { center: true } : { grow, focus: last ? [last[0], last[1]] : null });
+  if (added && last) Sfx.put(last[2]);
+  if (G.over && !wasOver) finish();
+}
+
+function copyInvite() {
+  navigator.clipboard?.writeText(inviteUrl())
+    .then(() => waitMsg('Đã copy link mời, dán gửi qua Zalo/Messenger nhé!', 'ok'))
+    .catch(() => waitMsg('Không copy tự động được, hãy chạm giữ vào đường link để copy.', 'err'));
+}
+$('#shareBtn').addEventListener('click', async () => {
+  if (!NET.code) return;
+  if (navigator.share) { try { await navigator.share({ title: 'Cờ caro', text: `Vào đánh caro với mình! Mã phòng ${NET.code}`, url: inviteUrl() }); } catch {} }
+  else copyInvite();
+});
+$('#copyBtn').addEventListener('click', () => { if (NET.code) copyInvite(); });
+$('#cancelRoomBtn').addEventListener('click', () => { leaveRoom(); show('setup'); });
+$('#joinBtn').addEventListener('click', joinRoom);
+$('#codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') joinRoom(); });
+addEventListener('beforeunload', () => { if (NET.role === 'host') NET.link?.close(); });
+
 // ================= Nút bấm =================
 $('#startBtn').addEventListener('click', () => {
+  if (S.mode === 'online') return createRoom();
   store.set('caro-setup', S);
-  $('#setup').hidden = true; $('#game').hidden = false;
-  document.body.classList.add('playing');
+  show('game');
   newGame();
 });
 $('#newBtn').addEventListener('click', () => {
+  if (S.mode === 'online' && NET.role === 'guest') { if (G.over) NET.link?.send({ t: 'again' }); return; }
   if (!G.over && G.moves.length > 2 && !confirm('Bỏ ván đang chơi và bắt đầu ván mới?')) return;
   newGame();
 });
 $('#undoBtn').addEventListener('click', undo);
 $('#setupBtn').addEventListener('click', () => {
-  if (!G.over && G.moves.length > 2 && !confirm('Bỏ ván đang chơi để đổi chế độ?')) return;
+  if (S.mode === 'online') {
+    if (!confirm('Rời phòng? Ván online sẽ kết thúc.')) return;
+    leaveRoom();
+  } else if (!G.over && G.moves.length > 2 && !confirm('Bỏ ván đang chơi để đổi chế độ?')) return;
   G.token++;
-  $('#game').hidden = true; $('#setup').hidden = false;
-  document.body.classList.remove('playing');
-  renderSetup();
+  show('setup');
 });
+
+// Mở từ link mời: chuyển sang chế độ online, điền sẵn mã phòng
+$('#nameInput').value = store.get('caro-name', '');
+const invite = new URLSearchParams(location.search).get('room');
+if (invite) {
+  S.mode = 'online';
+  $('#codeInput').value = Net2P.cleanCode(invite);
+  $('#joinTitle').textContent = `Bạn được mời vào phòng ${$('#codeInput').value}`;
+  $('#joinBtn').textContent = 'Vào phòng';
+  renderSetup();
+  netMsg('Nhập tên của bạn rồi bấm "Vào phòng".');
+}
 </script>
 </body>
 </html>

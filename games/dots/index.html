@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nối chấm · Mr.MinhDepTrai</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔵</text></svg>">
+<link rel="manifest" href="../../manifest.webmanifest">
+<meta name="theme-color" content="#2b1250">
+<link rel="apple-touch-icon" href="../../icons/site-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script src="../../pwa.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f5f7; --card: #fff; --text: #1d1d1f; --muted: #6e6e73; --line: #e2e2e7;
+    --accent: #0a84ff; --good: #1e8e3e; --p1: #e5484d; --p2: #0a84ff; --paper: #fffdf6; --dot: #2c2c2e; --ghost: #c9c4b6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #000; --card: #1c1c1e; --text: #f5f5f7; --muted: #a1a1a6; --line: #2c2c2e; --good: #30d158;
+            --p1: #ff6b6b; --p2: #4da3ff; --paper: #1b1a17; --dot: #e5e5ea; --ghost: #4a463c; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body { font: 16px/1.4 "Be Vietnam Pro", -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+  button { font: inherit; cursor: pointer; border: 0; }
+  button:disabled { opacity: .4; cursor: default; }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 720px; margin: 0 auto; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; gap: 10px;
+          padding: calc(10px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom)); }
+  .bar { display: flex; align-items: center; gap: 8px; }
+  .bar h1 { flex: 1; margin: 0; font-size: 18px; font-weight: 900; text-align: center; }
+  .bar .right { width: 96px; display: flex; justify-content: flex-end; }
+  .pill { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 13px; border-radius: 999px;
+          background: var(--card); border: 1px solid var(--line); color: var(--accent); font-weight: 700; font-size: 14px;
+          text-decoration: none; white-space: nowrap; }
+
+  .setup { display: flex; flex-direction: column; gap: 14px; }
+  .hero { border-radius: 24px; padding: 20px 18px; text-align: center; color: #fff;
+          background: linear-gradient(135deg, #ff9f43, #ee5a6f 50%, #6c5ce7); box-shadow: 0 10px 26px rgba(238, 90, 111, .3); }
+  .hero svg { width: 120px; height: 84px; }
+  .hero h2 { margin: 4px 0 2px; font-size: 26px; font-weight: 900; }
+  .hero p { margin: 0; opacity: .9; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 18px; }
+  .panel h3 { margin: 0 0 10px; font-size: 17px; }
+  .panel h3:not(:first-child) { margin-top: 18px; }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+  .seg.grid3 { grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); }
+  .seg button { padding: 12px 4px; border-radius: 14px; background: var(--bg); color: var(--text); font-weight: 700; font-size: 16px;
+                border: 2px solid var(--line); }
+  .seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .seg small { display: block; font-weight: 500; font-size: 12px; opacity: .8; }
+  .note { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+  .primary { padding: 15px; border-radius: 16px; background: var(--accent); color: #fff; font-weight: 800; font-size: 18px; }
+  .rules summary { font-weight: 700; cursor: pointer; }
+  .rules ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); font-size: 15px; }
+  .rules li { margin: 5px 0; }
+
+  .game { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .tools { display: flex; gap: 6px; align-items: center; }
+  .tools .sp { flex: 1; }
+  .players { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pl { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 16px; background: var(--card);
+        border: 2px solid var(--line); transition: border-color .2s, box-shadow .2s; }
+  .pl .sw { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+  .pl.p1 .sw { background: var(--p1); } .pl.p2 .sw { background: var(--p2); }
+  .pl .nm { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pl .pts { font-size: 24px; font-weight: 900; }
+  .pl.p1.on { border-color: var(--p1); box-shadow: 0 0 0 3px color-mix(in srgb, var(--p1) 25%, transparent); }
+  .pl.p2.on { border-color: var(--p2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--p2) 25%, transparent); }
+  .msg { text-align: center; font-weight: 700; min-height: 22px; }
+  .boardbox { background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 6px; }
+  #board { display: block; width: 100%; height: auto; max-height: 72vh; margin: 0 auto; touch-action: manipulation; user-select: none; }
+  .dot { fill: var(--dot); }
+  .ghost { stroke: var(--ghost); stroke-dasharray: 2 7; stroke-linecap: round; }
+  .hit { stroke: transparent; cursor: pointer; }
+  .edge:hover .ghost { stroke: var(--muted); stroke-dasharray: none; opacity: .5; }
+  .ln { stroke-linecap: round; }
+  .ln.p1 { stroke: var(--p1); color: var(--p1); } .ln.p2 { stroke: var(--p2); color: var(--p2); }
+  .ln.last { animation: draw .35s ease-out; filter: drop-shadow(0 0 4px currentColor); }
+  @keyframes draw { from { opacity: 0; stroke-width: 18; } }
+  .bx { opacity: .2; } .bx.p1 { fill: var(--p1); } .bx.p2 { fill: var(--p2); }
+  .bx.new { animation: fillIn .4s ease-out; }
+  @keyframes fillIn { from { opacity: .6; } }
+  .bt { font-weight: 900; text-anchor: middle; dominant-baseline: central; }
+  .bt.p1 { fill: var(--p1); } .bt.p2 { fill: var(--p2); }
+  .end { text-align: center; padding: 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+  .end b { font-size: 20px; display: block; margin-bottom: 8px; }
+  .end button { padding: 12px 20px; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 800; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <a class="pill" href="../../">← Trang chủ</a>
+    <h1>🔵 Nối chấm</h1>
+    <span class="right"><button class="pill" id="soundBtn" aria-label="Bật/tắt âm thanh">🔊</button></span>
+  </header>
+
+  <section class="setup" id="setup">
+    <div class="hero">
+      <svg viewBox="0 0 120 84" aria-hidden="true">
+        <rect x="14" y="14" width="40" height="40" fill="#fff" opacity=".25"/>
+        <g stroke-linecap="round" stroke-width="6">
+          <line x1="14" y1="14" x2="54" y2="14" stroke="#fff"/><line x1="14" y1="14" x2="14" y2="54" stroke="#fff"/>
+          <line x1="54" y1="14" x2="54" y2="54" stroke="#ffe08a"/><line x1="14" y1="54" x2="54" y2="54" stroke="#ffe08a"/>
+          <line x1="54" y1="14" x2="94" y2="14" stroke="#c9d8ff"/>
+        </g>
+        <g fill="#fff"><circle cx="14" cy="14" r="6"/><circle cx="54" cy="14" r="6"/><circle cx="94" cy="14" r="6"/>
+          <circle cx="14" cy="54" r="6"/><circle cx="54" cy="54" r="6"/><circle cx="94" cy="54" r="6"/></g>
+      </svg>
+      <h2>Nối chấm</h2>
+      <p>Khép kín ô vuông là được điểm và đi tiếp!</p>
+    </div>
+    <div class="panel">
+      <h3>Chơi với ai</h3>
+      <div class="seg" id="segMode">
+        <button data-v="ai">🤖 Với máy<small>Một mình</small></button>
+        <button data-v="pvp">👥 2 người<small>Chung một máy</small></button>
+      </div>
+      <div id="aiBox">
+        <h3>Độ khó</h3>
+        <div class="seg" id="segLevel">
+          <button data-v="easy">Dễ</button><button data-v="mid">Vừa</button><button data-v="hard">Khó</button>
+        </div>
+        <h3>Ai đi trước</h3>
+        <div class="seg" id="segFirst">
+          <button data-v="me">🙂 Bạn</button><button data-v="ai">🤖 Máy</button>
+        </div>
+      </div>
+      <h3>Số chấm mỗi cạnh</h3>
+      <div class="seg grid3" id="segSize">
+        <button data-v="3">4 × 4<small>9 ô</small></button>
+        <button data-v="4">5 × 5<small>16 ô</small></button>
+        <button data-v="5">6 × 6<small>25 ô</small></button>
+        <button data-v="6">7 × 7<small>36 ô</small></button>
+        <button data-v="8">9 × 9<small>64 ô</small></button>
+        <button data-v="10">11 × 11<small>100 ô</small></button>
+      </div>
+      <p class="note" id="sizeNote"></p>
+    </div>
+    <button class="primary" id="startBtn">Bắt đầu chơi</button>
+    <details class="panel rules">
+      <summary>📖 Cách chơi</summary>
+      <ul>
+        <li>Hai người lần lượt nối <b>2 chấm cạnh nhau</b> (ngang hoặc dọc) bằng một đường thẳng.</li>
+        <li>Ai vẽ cạnh cuối cùng <b>khép kín một ô vuông</b> thì ô đó thuộc về người đó và <b>được đi tiếp</b>.</li>
+        <li>Hết đường để nối thì ai có <b>nhiều ô hơn</b> là thắng.</li>
+        <li>Mẹo: tránh vẽ cạnh thứ 3 của một ô, vì đối thủ sẽ ăn ô đó.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="game" id="game" hidden>
+    <div class="tools">
+      <button class="pill" id="setupBtn">⚙️ Chế độ</button>
+      <span class="sp"></span>
+      <button class="pill" id="undoBtn">↶ Đi lại</button>
+      <button class="pill" id="newBtn">⟲ Ván mới</button>
+    </div>
+    <div class="players">
+      <div class="pl p1" id="pl1"><span class="sw"></span><span class="nm" id="nm1"></span><span class="pts" id="pt1">0</span></div>
+      <div class="pl p2" id="pl2"><span class="sw"></span><span class="nm" id="nm2"></span><span class="pts" id="pt2">0</span></div>
+    </div>
+    <div class="msg" id="msg"></div>
+    <div class="boardbox"><svg id="board" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    <div class="end" id="endBox" hidden><b id="endText"></b><button id="againBtn">Chơi ván mới</button></div>
+    <p class="note" id="tally" style="text-align:center"></p>
+  </section>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+
+// ================= Âm thanh =================
+const Sfx = {
+  ctx: null, on: store.get('dots-sound', true),
+  init() {
+    if (!this.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) this.ctx = new AC(); }
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  tone(f, dur, { type = 'sine', vol = .15, at = 0, slide = null } = {}) {
+    const c = this.ctx;
+    if (!c || !this.on) return;
+    const t = c.currentTime + at, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + .02);
+  },
+  line(p) { this.tone(p === 1 ? 600 : 450, .07, { type: 'triangle', vol: .16, slide: p === 1 ? 800 : 350 }); },
+  box(n) { for (let i = 0; i < n; i++) { this.tone(880 + i * 220, .12, { type: 'triangle', at: i * .1 }); } this.tone(1320, .2, { type: 'triangle', vol: .12, at: n * .1 }); },
+  win() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, .25, { type: 'triangle', at: i * .12 })); this.tone(1047, .6, { type: 'triangle', vol: .12, at: .5 }); },
+  lose() { [392, 330, 262, 196].forEach((f, i) => this.tone(f, .3, { type: 'triangle', vol: .13, at: i * .18 })); },
+  draw() { this.tone(440, .2, { type: 'triangle' }); this.tone(440, .3, { type: 'triangle', at: .25 }); }
+};
+['pointerdown', 'touchend', 'click'].forEach(t => addEventListener(t, () => Sfx.init(), { passive: true }));
+function renderSound() { $('#soundBtn').textContent = Sfx.on ? '🔊' : '🔇'; }
+$('#soundBtn').addEventListener('click', () => { Sfx.on = !Sfx.on; store.set('dots-sound', Sfx.on); renderSound(); });
+renderSound();
+
+// ================= Cài đặt =================
+const S = Object.assign({ mode: 'ai', level: 'mid', first: 'me', size: 4 }, store.get('dots-setup', {}));
+function renderSetup() {
+  const mark = (id, v) => document.querySelectorAll(`#${id} button`).forEach(b => b.classList.toggle('on', b.dataset.v === String(v)));
+  mark('segMode', S.mode); mark('segLevel', S.level); mark('segFirst', S.first); mark('segSize', S.size);
+  $('#aiBox').hidden = S.mode !== 'ai';
+  const n = S.size;
+  $('#sizeNote').textContent = `Lưới ${n + 1} × ${n + 1} chấm, có ${n * n} ô vuông và ${2 * n * (n + 1)} đường để nối.`
+    + (n >= 8 ? ' Bàn lớn, chơi lâu hơn.' : n === 3 ? ' Bàn nhỏ, chơi nhanh.' : '');
+}
+const bindSeg = (id, k, num) => $(`#${id}`).addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  S[k] = num ? +b.dataset.v : b.dataset.v;
+  store.set('dots-setup', S); renderSetup();
+});
+bindSeg('segMode', 'mode'); bindSeg('segLevel', 'level'); bindSeg('segFirst', 'first'); bindSeg('segSize', 'size', true);
+renderSetup();
+
+// ================= Bàn chơi =================
+// Cạnh ngang h r c: nối chấm (r,c)-(r,c+1); cạnh dọc v r c: nối chấm (r,c)-(r+1,c). Ô (r,c) có 4 cạnh.
+const G = { n: 4, drawn: new Map(), boxes: new Map(), turn: 1, hist: [], over: false, token: 0, human: 1 };
+const eid = (k, r, c) => `${k}${r}_${c}`;
+const parse = e => { const [r, c] = e.slice(1).split('_').map(Number); return { k: e[0], r, c }; };
+
+function allEdges(n) {
+  const out = [];
+  for (let r = 0; r <= n; r++) for (let c = 0; c < n; c++) out.push(eid('h', r, c));
+  for (let r = 0; r < n; r++) for (let c = 0; c <= n; c++) out.push(eid('v', r, c));
+  return out;
+}
+function boxesOf(e, n = G.n) {
+  const { k, r, c } = parse(e), out = [];
+  if (k === 'h') { if (r > 0) out.push([r - 1, c]); if (r < n) out.push([r, c]); }
+  else { if (c > 0) out.push([r, c - 1]); if (c < n) out.push([r, c]); }
+  return out;
+}
+const sidesOf = (r, c) => [eid('h', r, c), eid('h', r + 1, c), eid('v', r, c), eid('v', r, c + 1)];
+const countIn = (set, r, c) => sidesOf(r, c).reduce((s, e) => s + (set.has(e) ? 1 : 0), 0);
+const isAi = p => S.mode === 'ai' && p !== G.human;
+const isAiTurn = () => !G.over && isAi(G.turn);
+const scoreOf = p => [...G.boxes.values()].filter(v => v === p).length;
+
+function newGame() {
+  G.token++;
+  G.n = S.size; G.drawn = new Map(); G.boxes = new Map(); G.hist = []; G.over = false; G.turn = 1;
+  G.human = S.mode === 'ai' && S.first === 'ai' ? 2 : 1;
+  G.edges = allEdges(G.n);
+  $('#nm1').textContent = S.mode === 'ai' ? (G.human === 1 ? 'Bạn' : 'Máy') : 'Người 1';
+  $('#nm2').textContent = S.mode === 'ai' ? (G.human === 2 ? 'Bạn' : 'Máy') : 'Người 2';
+  buildBoard();
+  render();
+  scheduleAi();
+}
+
+function play(e) {
+  if (G.over || G.drawn.has(e)) return;
+  const p = G.turn;
+  G.drawn.set(e, p);
+  const made = boxesOf(e).filter(([r, c]) => countIn(G.drawn, r, c) === 4);
+  made.forEach(([r, c]) => G.boxes.set(r + ',' + c, p));
+  G.hist.push({ e, p, made });
+  if (!made.length) G.turn = 3 - p;
+  if (G.drawn.size === G.edges.length) G.over = true;
+  made.length ? Sfx.box(made.length) : Sfx.line(p);
+  render(e, made);
+  if (G.over) finish();
+  else scheduleAi();
+}
+
+function undo() {
+  if (!G.hist.length) return;
+  G.token++;
+  if (G.over) unscore();
+  let m;
+  do {
+    m = G.hist.pop();
+    G.drawn.delete(m.e);
+    m.made.forEach(([r, c]) => G.boxes.delete(r + ',' + c));
+  } while (S.mode === 'ai' && G.hist.length && m.p !== G.human);
+  G.turn = m.p; G.over = false;
+  render();
+  scheduleAi();
+}
+
+// ================= Máy chơi =================
+// Đếm số ô đối thủ ăn liền được nếu mình vẽ cạnh e (ăn dây chuyền cho tới khi hết ô có 3 cạnh)
+function giveaway(e) {
+  const set = new Set(G.drawn.keys());
+  set.add(e);
+  let count = 0;
+  for (let found = true; found;) {
+    found = false;
+    for (let r = 0; r < G.n && !found; r++) for (let c = 0; c < G.n && !found; c++) {
+      if (countIn(set, r, c) !== 3) continue;
+      const miss = sidesOf(r, c).find(x => !set.has(x));
+      set.add(miss);
+      count += boxesOf(miss).filter(([rr, cc]) => countIn(set, rr, cc) === 4).length;
+      found = true;
+    }
+  }
+  return count;
+}
+
+function aiMove() {
+  const free = G.edges.filter(e => !G.drawn.has(e));
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+  const capture = free.filter(e => boxesOf(e).some(([r, c]) => countIn(G.drawn, r, c) === 3));
+  const safe = free.filter(e => boxesOf(e).every(([r, c]) => countIn(G.drawn, r, c) < 2));
+  const lv = S.level;
+  if (lv === 'easy') {
+    if (capture.length && Math.random() < .6) return pick(capture);
+    return pick(safe.length && Math.random() < .5 ? safe : free);
+  }
+  if (capture.length) return pick(capture);
+  if (safe.length) {
+    if (lv === 'hard') { // ưu tiên cạnh nằm cạnh ô còn trống trơn để giữ thế
+      const score = e => boxesOf(e).reduce((s, [r, c]) => s + countIn(G.drawn, r, c), 0);
+      const best = Math.min(...safe.map(score));
+      return pick(safe.filter(e => score(e) === best));
+    }
+    return pick(safe);
+  }
+  if (lv === 'mid') return pick(free);
+  // Khó: buộc phải mở ô thì chọn chỗ cho đối thủ ăn ít ô nhất
+  let best = Infinity, opts = [];
+  free.forEach(e => {
+    const g = giveaway(e);
+    if (g < best) { best = g; opts = [e]; } else if (g === best) opts.push(e);
+  });
+  return pick(opts);
+}
+
+function scheduleAi() {
+  if (!isAiTurn()) return;
+  const t = G.token;
+  setTimeout(() => { if (t === G.token && isAiTurn()) play(aiMove()); }, 420);
+}
+
+// ================= Kết thúc & điểm =================
+const tallyKey = () => `dots-tally-${S.mode}`;
+let scoredAs = null;
+function finish() {
+  const a = scoreOf(1), b = scoreOf(2), t = store.get(tallyKey(), { p1: 0, p2: 0, draw: 0 });
+  const w = a === b ? 0 : a > b ? 1 : 2;
+  scoredAs = S.mode === 'ai' ? (w === 0 ? 'draw' : w === G.human ? 'p1' : 'p2') : (w === 0 ? 'draw' : 'p' + w);
+  t[scoredAs]++;
+  store.set(tallyKey(), t);
+  let txt;
+  if (!w) txt = `🤝 Hoà ${a} – ${b}!`;
+  else if (S.mode === 'ai') txt = w === G.human ? `🎉 Bạn thắng ${Math.max(a, b)} – ${Math.min(a, b)}!` : `😢 Máy thắng ${Math.max(a, b)} – ${Math.min(a, b)}`;
+  else txt = `🎉 Người ${w} thắng ${Math.max(a, b)} – ${Math.min(a, b)}!`;
+  $('#endText').textContent = txt;
+  $('#endBox').hidden = false;
+  renderTally();
+  !w ? Sfx.draw() : (S.mode === 'ai' && w !== G.human) ? Sfx.lose() : Sfx.win();
+}
+function unscore() {
+  if (!scoredAs) return;
+  const t = store.get(tallyKey(), { p1: 0, p2: 0, draw: 0 });
+  t[scoredAs] = Math.max(0, t[scoredAs] - 1);
+  store.set(tallyKey(), t);
+  scoredAs = null;
+}
+function renderTally() {
+  const t = store.get(tallyKey(), { p1: 0, p2: 0, draw: 0 });
+  $('#tally').textContent = S.mode === 'ai'
+    ? `Tổng số ván: Bạn thắng ${t.p1} · Máy thắng ${t.p2} · Hoà ${t.draw}`
+    : `Tổng số ván: Người 1 thắng ${t.p1} · Người 2 thắng ${t.p2} · Hoà ${t.draw}`;
+}
+
+// ================= Vẽ bàn (SVG) =================
+const U = 60, PAD = 22, NS = 'http://www.w3.org/2000/svg';
+const svg = $('#board');
+const P = (r, c) => [PAD + c * U, PAD + r * U];
+const ends = e => { const { k, r, c } = parse(e); return k === 'h' ? [P(r, c), P(r, c + 1)] : [P(r, c), P(r + 1, c)]; };
+const el = (tag, attrs) => { const x = document.createElementNS(NS, tag); for (const k in attrs) x.setAttribute(k, attrs[k]); return x; };
+let layers = {};
+
+function buildBoard() {
+  const n = G.n, size = n * U + PAD * 2;
+  svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+  svg.style.maxWidth = Math.max(300, Math.min(660, n * 92)) + 'px';
+  svg.innerHTML = '';
+  layers = { boxes: el('g', {}), edges: el('g', {}), dots: el('g', {}) };
+  Object.values(layers).forEach(g => svg.appendChild(g));
+  const dotR = n >= 8 ? 5 : 6.5;
+  G.edges.forEach(e => {
+    const [[x1, y1], [x2, y2]] = ends(e), g = el('g', { class: 'edge', 'data-e': e });
+    g.appendChild(el('line', { class: 'ghost', x1, y1, x2, y2, 'stroke-width': 3 }));
+    g.appendChild(el('line', { class: 'hit', x1, y1, x2, y2, 'stroke-width': 30 }));
+    layers.edges.appendChild(g);
+  });
+  for (let r = 0; r <= n; r++) for (let c = 0; c <= n; c++) {
+    const [cx, cy] = P(r, c);
+    layers.dots.appendChild(el('circle', { class: 'dot', cx, cy, r: dotR }));
+  }
+}
+
+function render(lastE = null, newBoxes = []) {
+  const last = G.hist[G.hist.length - 1];
+  layers.edges.querySelectorAll('.edge').forEach(g => {
+    const e = g.dataset.e, p = G.drawn.get(e);
+    let ln = g.querySelector('.ln');
+    if (p) {
+      if (!ln) { const [[x1, y1], [x2, y2]] = ends(e); ln = el('line', { x1, y1, x2, y2, 'stroke-width': 8 }); g.appendChild(ln); }
+      ln.setAttribute('class', `ln p${p}${last && last.e === e ? ' last' : ''}`);
+      g.querySelector('.hit').style.display = 'none';
+    } else {
+      ln?.remove();
+      g.querySelector('.hit').style.display = '';
+    }
+  });
+  layers.boxes.innerHTML = '';
+  const fresh = new Set(newBoxes.map(([r, c]) => r + ',' + c));
+  G.boxes.forEach((p, k) => {
+    const [r, c] = k.split(',').map(Number), [x, y] = P(r, c);
+    layers.boxes.appendChild(el('rect', { class: `bx p${p}${fresh.has(k) ? ' new' : ''}`, x: x + 4, y: y + 4, width: U - 8, height: U - 8, rx: 6 }));
+    const t = el('text', { class: `bt p${p}`, x: x + U / 2, y: y + U / 2, 'font-size': U * .42 });
+    const name = $(`#nm${p}`).textContent;
+    t.textContent = S.mode === 'ai' ? (name === 'Bạn' ? 'B' : 'M') : String(p);
+    layers.boxes.appendChild(t);
+  });
+  $('#pt1').textContent = scoreOf(1);
+  $('#pt2').textContent = scoreOf(2);
+  $('#pl1').classList.toggle('on', !G.over && G.turn === 1);
+  $('#pl2').classList.toggle('on', !G.over && G.turn === 2);
+  const who = p => $(`#nm${p}`).textContent;
+  $('#msg').textContent = G.over ? '' : isAiTurn() ? '🤖 Máy đang nghĩ…'
+    : newBoxes.length ? `✨ ${who(G.turn)} khép được ${newBoxes.length} ô, đi tiếp!` : `Lượt: ${who(G.turn)}`;
+  $('#endBox').hidden = !G.over;
+  $('#undoBtn').disabled = !G.hist.length || (S.mode === 'ai' && !G.hist.some(m => m.p === G.human));
+  renderTally();
+}
+
+svg.addEventListener('click', e => {
+  const g = e.target.closest('.edge');
+  if (!g || G.over || isAiTurn()) return;
+  play(g.dataset.e);
+});
+
+// ================= Nút bấm =================
+function show(name) {
+  $('#setup').hidden = name !== 'setup';
+  $('#game').hidden = name !== 'game';
+  scrollTo(0, 0);
+}
+$('#startBtn').addEventListener('click', () => { store.set('dots-setup', S); scoredAs = null; show('game'); newGame(); });
+$('#againBtn').addEventListener('click', () => { scoredAs = null; newGame(); });
+$('#newBtn').addEventListener('click', () => {
+  if (!G.over && G.hist.length > 2 && !confirm('Bỏ ván đang chơi và bắt đầu ván mới?')) return;
+  scoredAs = null;
+  newGame();
+});
+$('#undoBtn').addEventListener('click', undo);
+$('#setupBtn').addEventListener('click', () => {
+  if (!G.over && G.hist.length > 2 && !confirm('Bỏ ván đang chơi để đổi chế độ?')) return;
+  G.token++;
+  show('setup');
+});
+</script>
+</body>
+</html>
