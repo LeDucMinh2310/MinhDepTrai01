@@ -3,88 +3,137 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mr.MinhDepTrai</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>😎</text></svg>">
+<title>Viên Như Xinh Đẹp</title>
+<link rel="icon" type="image/png" href="icons/site-192.png">
 <script>
   // Link cũ của tool tải ảnh dạng ?folder=... vẫn mở thẳng tool
   if (new URLSearchParams(location.search).has('folder')) location.replace('tools/drive/' + location.search);
 </script>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#2b1250">
+<meta name="theme-color" content="#f472b6">
 <link rel="apple-touch-icon" href="icons/site-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="MinhDepTrai">
+<meta name="apple-mobile-web-app-title" content="Như Xinh Đẹp">
 <script src="pwa.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f5f7; --card: #fff; --text: #1d1d1f; --muted: #6e6e73; --line: #e2e2e7; --accent: #0a84ff;
+    --bg1: #fff0f7; --bg2: #f3e8ff; --bg3: #ffe9f0;
+    --card: rgba(255, 255, 255, .72); --card-solid: #fff; --text: #3b1d3a; --muted: #8a6b88;
+    --line: rgba(236, 72, 153, .16); --pink: #ec4899; --rose: #f472b6; --lilac: #a78bfa; --gold: #fbbf24;
+    --glow: rgba(236, 72, 153, .28);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #000; --card: #1c1c1e; --text: #f5f5f7; --muted: #a1a1a6; --line: #2c2c2e; }
+    :root { --bg1: #1d0f24; --bg2: #2a1240; --bg3: #170b1f; --card: rgba(48, 22, 58, .7); --card-solid: #2b1534;
+            --text: #fde7f3; --muted: #d4a8c8; --line: rgba(244, 114, 182, .2); --glow: rgba(244, 114, 182, .3); }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text);
-         font: 17px/1.5 "Be Vietnam Pro", -apple-system, "Segoe UI", Roboto, sans-serif; }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 16px 16px 48px; }
-
-  .hero { position: relative; overflow: hidden; isolation: isolate; border-radius: 26px; color: #fff;
-          padding: 44px 20px 36px; text-align: center;
-          background: linear-gradient(135deg, #1a1033, #2b1250 45%, #0f2a4a);
-          box-shadow: 0 14px 40px rgba(80, 40, 160, .28); }
-  .glow { position: absolute; inset: -40%; z-index: -1; opacity: .55; filter: blur(34px);
-          background: radial-gradient(circle at 25% 30%, #ff5f9e 0, transparent 35%),
-                      radial-gradient(circle at 75% 70%, #3ad7ff 0, transparent 35%),
-                      radial-gradient(circle at 70% 20%, #ffd166 0, transparent 25%);
-          animation: drift 12s ease-in-out infinite alternate; }
-  .logo { margin: 0; line-height: 1.1; display: flex; justify-content: center; align-items: baseline;
-          flex-wrap: wrap; gap: 4px; }
-  .mr { font-family: "Pacifico", cursive; font-weight: 400; font-size: clamp(24px, 6.5vw, 38px); color: #ffd166;
-        transform: rotate(-8deg); display: inline-block; text-shadow: 0 2px 10px rgba(255, 209, 102, .5); }
-  .name { font-weight: 900; letter-spacing: -1.5px; font-size: clamp(40px, 12vw, 72px);
-          background: linear-gradient(90deg, #ff5f9e, #ffd166, #3ad7ff, #b388ff, #ff5f9e);
-          background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
-          animation: shine 6s linear infinite; filter: drop-shadow(0 4px 14px rgba(255, 95, 158, .35)); }
-  .tagline { margin: 12px 0 0; color: rgba(255, 255, 255, .85); font-weight: 500; }
-  .chips { display: flex; justify-content: center; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
-  .chips a { color: #fff; text-decoration: none; font-weight: 700; font-size: 15px; padding: 9px 16px;
-             border-radius: 999px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .25); }
-  .chips .install { font: inherit; font-weight: 700; font-size: 15px; padding: 9px 16px; border-radius: 999px;
-                    cursor: pointer; border: 0; background: #ffd166; color: #2b1250; }
+  html { background: var(--bg1); }
+  body { margin: 0; min-height: 100vh; color: var(--text); overflow-x: hidden;
+         font: 17px/1.5 "Be Vietnam Pro", -apple-system, "Segoe UI", Roboto, sans-serif;
+         background: radial-gradient(1200px 600px at 10% -10%, var(--bg2), transparent 60%),
+                     radial-gradient(900px 600px at 110% 10%, var(--bg3), transparent 60%),
+                     linear-gradient(180deg, var(--bg1), var(--bg2)); background-attachment: fixed; }
   [hidden] { display: none !important; }
-  @keyframes shine { to { background-position: 300% 0; } }
-  @keyframes drift { to { transform: translate(8%, -6%) rotate(20deg); } }
-  @media (prefers-reduced-motion: reduce) { .name, .glow { animation: none; } }
 
-  section { margin-top: 34px; scroll-margin-top: 16px; }
-  h2 { font-size: 24px; margin: 0 0 2px; }
+  /* Lớp lấp lánh bay nhẹ phía sau */
+  .sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .sky span { position: absolute; bottom: -40px; color: var(--rose); opacity: 0; animation: rise linear infinite; }
+  @keyframes rise {
+    0% { transform: translateY(0) rotate(0); opacity: 0; }
+    10% { opacity: .9; } 85% { opacity: .7; }
+    100% { transform: translateY(-110vh) rotate(160deg); opacity: 0; }
+  }
+  .wrap { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 18px 16px 48px; }
+
+  /* ===== Phần đầu ===== */
+  .hero { position: relative; text-align: center; padding: 34px 18px 30px; border-radius: 32px; overflow: hidden;
+          background: linear-gradient(140deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .2));
+          border: 1px solid rgba(255, 255, 255, .7); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+          box-shadow: 0 20px 50px var(--glow), inset 0 1px 0 rgba(255, 255, 255, .8); }
+  @media (prefers-color-scheme: dark) { .hero { background: linear-gradient(140deg, rgba(80, 30, 90, .55), rgba(40, 15, 50, .35)); border-color: rgba(244, 114, 182, .25); } }
+  .hero::before { content: ""; position: absolute; inset: -30%; z-index: -1; opacity: .55; filter: blur(40px);
+                  background: radial-gradient(circle at 20% 30%, #ff9ccf 0, transparent 35%),
+                              radial-gradient(circle at 80% 70%, #c4b5fd 0, transparent 35%),
+                              radial-gradient(circle at 75% 15%, #fde68a 0, transparent 25%);
+                  animation: drift 14s ease-in-out infinite alternate; }
+  @keyframes drift { to { transform: translate(6%, -5%) rotate(18deg); } }
+
+  .avatar { position: relative; width: 148px; height: 148px; margin: 0 auto; border-radius: 50%; padding: 6px; cursor: pointer;
+            -webkit-tap-highlight-color: transparent; }
+  .avatar::before { content: ""; position: absolute; inset: 0; border-radius: 50%;
+                    background: conic-gradient(from 0deg, #f472b6, #fbbf24, #a78bfa, #60a5fa, #f472b6);
+                    animation: spin 6s linear infinite; filter: drop-shadow(0 0 14px rgba(244, 114, 182, .7)); }
+  .avatar img { position: relative; display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+                border: 4px solid #fff; transition: transform .3s; }
+  .avatar:active img { transform: scale(.94); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .crown { position: absolute; z-index: 2; top: -24px; left: 50%; transform: translateX(-50%) rotate(-8deg); font-size: 34px;
+           filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .2)); animation: bob 3s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateX(-50%) rotate(6deg) translateY(-4px); } }
+
+  .title { margin: 16px 0 0; line-height: 1.05; font-family: "Dancing Script", cursive; font-weight: 700; }
+  .title .a, .title .b { display: block; background: linear-gradient(90deg, #ec4899, #f59e0b, #a855f7, #ec4899);
+                         background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+                         animation: shine 7s linear infinite; filter: drop-shadow(0 3px 10px rgba(236, 72, 153, .25)); }
+  .title .a { font-size: clamp(46px, 13vw, 78px); }
+  .title .b { font-size: clamp(36px, 10vw, 60px); margin-top: -4px; }
+  @keyframes shine { to { background-position: 300% 0; } }
+  .tag { margin: 10px 0 0; color: var(--muted); font-weight: 500; }
+  .chips { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .chips a, .chips button { font: inherit; font-weight: 700; font-size: 15px; padding: 10px 18px; border-radius: 999px; cursor: pointer;
+                            text-decoration: none; color: var(--text); background: var(--card); border: 1px solid var(--line);
+                            box-shadow: 0 4px 14px var(--glow); transition: transform .15s; }
+  .chips a:hover, .chips button:hover { transform: translateY(-2px); }
+  .chips .install { background: linear-gradient(135deg, #f472b6, #a78bfa); color: #fff; border: 0; }
+
+  /* ===== Các mục ===== */
+  section { margin-top: 36px; scroll-margin-top: 16px; }
+  h2 { font-size: 24px; margin: 0 0 2px; display: flex; align-items: center; gap: 8px; }
+  h2::after { content: "♡"; color: var(--rose); font-size: 18px; }
   .sub { margin: 0 0 14px; color: var(--muted); }
-  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-  .tile { display: flex; gap: 14px; align-items: center; padding: 16px; border-radius: 20px;
-          background: var(--card); border: 1px solid var(--line); color: inherit; text-decoration: none;
-          transition: transform .15s, box-shadow .15s; -webkit-tap-highlight-color: transparent; }
-  .tile:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0, 0, 0, .08); }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
+  .tile { display: flex; gap: 14px; align-items: center; padding: 16px; border-radius: 24px; color: inherit; text-decoration: none;
+          background: var(--card); border: 1px solid var(--line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+          box-shadow: 0 8px 24px rgba(236, 72, 153, .1); transition: transform .18s, box-shadow .18s; -webkit-tap-highlight-color: transparent; }
+  .tile:hover { transform: translateY(-3px); box-shadow: 0 14px 32px var(--glow); }
   .tile:active { transform: scale(.98); }
-  .ico { flex: none; width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center;
-         font-size: 32px; }
-  .ico.drive { background: linear-gradient(135deg, #4a7bd8, #3ad7ff); }
-  .ico.cards { background: linear-gradient(135deg, #0f7a4a, #34c759); }
-  .ico.caro { background: linear-gradient(135deg, #ff6b6b, #8e44ef 55%, #0a84ff); }
-  .ico.dots { background: linear-gradient(135deg, #ff9f43, #ee5a6f 50%, #6c5ce7); }
+  .ico { flex: none; width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center; font-size: 32px;
+         box-shadow: inset 0 -4px 10px rgba(0, 0, 0, .12), 0 6px 14px rgba(0, 0, 0, .12); }
+  .ico.drive { background: linear-gradient(135deg, #7dd3fc, #818cf8); }
+  .ico.cards { background: linear-gradient(135deg, #34d399, #059669); }
+  .ico.caro { background: linear-gradient(135deg, #fb7185, #a855f7); }
+  .ico.dots { background: linear-gradient(135deg, #fbbf24, #f472b6); }
   .tile h3 { margin: 0; font-size: 19px; }
   .tile p { margin: 2px 0 0; color: var(--muted); font-size: 15px; line-height: 1.4; }
-  .go { margin-left: auto; color: var(--accent); font-size: 26px; font-weight: 300; }
-  footer { margin-top: 40px; text-align: center; color: var(--muted); font-size: 14px; }
+  .badge { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 800;
+           vertical-align: 3px; color: #fff; background: linear-gradient(135deg, #f472b6, #a78bfa); }
+  .go { margin-left: auto; color: var(--pink); font-size: 26px; font-weight: 300; }
+  footer { margin-top: 44px; text-align: center; color: var(--muted); font-size: 14px; }
+  footer b { font-family: "Dancing Script", cursive; font-size: 22px; color: var(--pink); }
+
+  /* Tim bay khi chạm avatar */
+  .burst { position: fixed; pointer-events: none; z-index: 50; font-size: 22px; animation: burst .9s ease-out forwards; }
+  @keyframes burst { to { transform: translate(var(--dx), var(--dy)) scale(.4); opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sky, .hero::before { display: none; }
+    .avatar::before, .title .a, .title .b, .crown { animation: none; }
+  }
 </style>
 </head>
 <body>
+<div class="sky" id="sky" aria-hidden="true"></div>
 <div class="wrap">
   <header class="hero">
-    <div class="glow" aria-hidden="true"></div>
-    <h1 class="logo"><span class="mr">Mr.</span><span class="name">MinhDepTrai</span></h1>
-    <p class="tagline">Góc nhỏ của Minh · công cụ tiện ích & giải trí ✨</p>
+    <div class="avatar" id="avatar" role="img" aria-label="Ảnh đại diện Viên Như">
+      <span class="crown">👑</span>
+      <img src="img/nhu.jpg" alt="Viên Như" width="136" height="136">
+    </div>
+    <h1 class="title"><span class="a">Viên Như</span><span class="b">Xinh Đẹp ✨</span></h1>
+    <p class="tag">Góc nhỏ lung linh · công cụ tiện ích & trò chơi 💖</p>
     <nav class="chips">
       <a href="#tools">🧰 Công cụ</a>
       <a href="#games">🎮 Giải trí</a>
@@ -106,27 +155,63 @@
 
   <section id="games">
     <h2>🎮 Giải trí</h2>
-    <p class="sub">Chơi cho vui lúc rảnh.</p>
+    <p class="sub">Chơi với máy hoặc rủ bạn bè vào phòng online.</p>
     <div class="grid">
       <a class="tile" href="games/tien-len/">
         <span class="ico cards">🃏</span>
-        <span><h3>Tiến lên miền Nam</h3><p>Đấu với máy hoặc mời bạn bè vào phòng, có tính điểm.</p></span>
+        <span><h3>Tiến lên miền Nam<span class="badge">ONLINE</span></h3><p>Đấu với máy hoặc mời bạn bè vào phòng, có tính điểm.</p></span>
         <span class="go">›</span>
       </a>
       <a class="tile" href="games/caro/">
         <span class="ico caro">⭕</span>
-        <span><h3>Cờ caro (X-O)</h3><p>Đấu với máy, 2 người hoặc online với bạn bè, bàn tự mở rộng khi đánh gần mép.</p></span>
+        <span><h3>Cờ caro (X-O)<span class="badge">ONLINE</span></h3><p>Bàn tự mở rộng khi đánh gần mép, đấu với máy hoặc với bạn.</p></span>
         <span class="go">›</span>
       </a>
       <a class="tile" href="games/dots/">
         <span class="ico dots">🔵</span>
-        <span><h3>Nối chấm</h3><p>Nối các chấm, khép kín ô vuông để ghi điểm. Chọn lưới từ 4×4 đến 11×11 chấm.</p></span>
+        <span><h3>Nối chấm<span class="badge">ONLINE</span></h3><p>Nối các chấm, khép kín ô vuông để ghi điểm. Lưới từ 4×4 đến 11×11.</p></span>
         <span class="go">›</span>
       </a>
     </div>
   </section>
 
-  <footer>© Mr.MinhDepTrai</footer>
+  <footer>Làm bằng cả trái tim 💖 cho<br><b>Viên Như Xinh Đẹp</b></footer>
 </div>
+
+<script>
+  // Lấp lánh bay nhẹ phía sau
+  (() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const sky = document.getElementById('sky'), marks = ['✦', '✧', '♡', '❀', '✦', '⋆'];
+    for (let i = 0; i < 22; i++) {
+      const s = document.createElement('span');
+      s.textContent = marks[i % marks.length];
+      s.style.left = Math.random() * 100 + '%';
+      s.style.fontSize = 10 + Math.random() * 16 + 'px';
+      s.style.animationDuration = 12 + Math.random() * 14 + 's';
+      s.style.animationDelay = -Math.random() * 20 + 's';
+      if (i % 3 === 0) s.style.color = '#c4b5fd';
+      if (i % 5 === 0) s.style.color = '#fcd34d';
+      sky.appendChild(s);
+    }
+  })();
+
+  // Chạm vào avatar: tim bay tung toé
+  document.getElementById('avatar').addEventListener('click', e => {
+    const hearts = ['💖', '💗', '💕', '✨', '🌸'];
+    for (let i = 0; i < 12; i++) {
+      const h = document.createElement('span');
+      const a = Math.PI * 2 * i / 12, d = 70 + Math.random() * 60;
+      h.className = 'burst';
+      h.textContent = hearts[i % hearts.length];
+      h.style.left = e.clientX - 11 + 'px';
+      h.style.top = e.clientY - 11 + 'px';
+      h.style.setProperty('--dx', Math.cos(a) * d + 'px');
+      h.style.setProperty('--dy', Math.sin(a) * d + 'px');
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 950);
+    }
+  });
+</script>
 </body>
 </html>

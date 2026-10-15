@@ -1,11 +1,11 @@
 // Service worker: lưu sẵn các trang để mở được khi mất mạng và để cài thành app.
 // Trang HTML luôn lấy bản mới khi có mạng; tệp khác dùng bản đã lưu rồi cập nhật ngầm.
-const CACHE = 'mrminhdeptrai-v3';
+const CACHE = 'vien-nhu-v4';
 const CORE = [
   './', 'index.html', 'pwa.js', 'manifest.webmanifest',
   'tools/drive/', 'tools/drive/huong-dan.html',
   'games/tien-len/', 'games/tien-len/manifest.webmanifest', 'games/caro/', 'games/dots/', 'games/net2p.js',
-  'icons/site-192.png', 'icons/site-512.png', 'icons/tienlen-192.png', 'icons/tienlen-512.png'
+  'img/nhu.jpg', 'icons/site-192.png', 'icons/site-512.png', 'icons/tienlen-192.png', 'icons/tienlen-512.png'
 ];
 // Chỉ lưu tệp của web này, phông chữ và thư viện kết nối; không bao giờ lưu dữ liệu Google Drive
 const CACHEABLE_HOSTS = /^(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net)$/;

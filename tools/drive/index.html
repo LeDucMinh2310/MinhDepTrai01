@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mr.MinhDepTrai</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>😎</text></svg>">
+<title>Tải ảnh Drive · Viên Như Xinh Đẹp</title>
+<link rel="icon" type="image/png" href="../../icons/site-192.png">
 <link rel="manifest" href="../../manifest.webmanifest">
 <meta name="theme-color" content="#2b1250">
 <link rel="apple-touch-icon" href="../../icons/site-180.png">
@@ -34,6 +34,8 @@
            display: block; text-decoration: none; -webkit-tap-highlight-color: transparent;
            transition: transform .15s; }
   .brand:active { transform: scale(.98); }
+  .brand-av { display: block; width: 64px; height: 64px; margin: 0 auto 10px; border-radius: 50%; object-fit: cover;
+              border: 3px solid #fff; box-shadow: 0 0 0 3px #f472b6, 0 0 18px rgba(244, 114, 182, .7); }
   .home-link { display: inline-block; margin: 0 0 10px; padding: 7px 14px; border-radius: 999px;
                background: var(--card); border: 1px solid var(--line); color: var(--accent);
                font-weight: 600; font-size: 15px; text-decoration: none; }
@@ -140,9 +142,10 @@
 <body>
 <header>
   <a class="home-link" href="../../">← Trang chủ</a>
-  <a class="brand" href="./" aria-label="Mr.MinhDepTrai: về trang chính">
+  <a class="brand" href="./" aria-label="Viên Như Xinh Đẹp: về trang chính">
     <div class="glow" aria-hidden="true"></div>
-    <h1 class="logo"><span class="mr">Mr.</span><span class="name">MinhDepTrai</span></h1>
+    <img class="brand-av" src="../../img/nhu.jpg" alt="" width="64" height="64">
+    <h1 class="logo"><span class="mr">Viên Như</span><span class="name">Xinh Đẹp</span></h1>
     <p class="tagline">Tải ảnh từ Google Drive về điện thoại <span class="spark">✨</span></p>
   </a>
   <form id="form">
